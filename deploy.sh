@@ -21,7 +21,7 @@ fi
 # Create virtual environment if it doesn't exist
 if [ ! -d "venv" ]; then
     echo "📦 Creating virtual environment..."
-    python -m venv venv
+    python3 -m venv venv
 fi
 
 # Activate virtual environment
@@ -34,9 +34,9 @@ pip install -r requirements.txt
 
 # Run tests
 echo "🧪 Running tests..."
-python test_complete_system.py
+python3 test_complete_system.py
 
 # Start the application
 echo "🎉 Starting Boku AI Assistant..."
 echo "📱 Access the application at: http://localhost:7871"
-python app.py
+python3 app.py

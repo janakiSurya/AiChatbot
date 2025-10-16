@@ -4,7 +4,6 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![HuggingFace](https://img.shields.io/badge/HuggingFace-Mistral--7B-yellow.svg)](https://huggingface.co)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://docker.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## ✨ Features
@@ -13,8 +12,6 @@
 - 🔍 **Hybrid Search Engine**: Combines vector similarity and keyword matching for accurate results
 - 🎯 **Context-Aware**: Retrieves relevant information from Surya's portfolio data
 - ⚡ **Optimized Performance**: Clean, efficient codebase with 35% code reduction
-- 🐳 **Docker Ready**: Containerized deployment with health checks
-- 🔄 **CI/CD Pipeline**: Automated testing and deployment workflows
 - 🎨 **Modern UI**: Beautiful Gradio interface for seamless interaction
 
 ## 🚀 Quick Start
@@ -22,7 +19,6 @@
 ### Prerequisites
 - Python 3.8+
 - HuggingFace API key
-- Docker (optional)
 
 ### Installation
 
@@ -79,8 +75,6 @@ Access the application at `http://localhost:7871`
 - **Vector Search**: FAISS with Sentence Transformers
 - **Web Framework**: Gradio
 - **Language**: Python 3.8+
-- **Containerization**: Docker & Docker Compose
-- **CI/CD**: GitHub Actions
 
 ## 📁 Project Structure
 
@@ -99,9 +93,6 @@ Access the application at `http://localhost:7871`
 │   └── keyword_extractor.py  # Keyword processing
 ├── data/                  # Data storage
 │   └── portfolio_data.py  # Portfolio information
-├── .github/workflows/     # CI/CD pipelines
-├── Dockerfile            # Container configuration
-├── docker-compose.yml    # Container orchestration
 └── README.md            # This file
 ```
 
@@ -128,38 +119,11 @@ SERVER_HOST=0.0.0.0
 TEMPERATURE=0.7
 ```
 
-## 🐳 Docker Deployment
-
-### Using Docker Compose
-
-```bash
-# Set environment variables
-export HF_API_KEY=your_key_here
-
-# Deploy
-docker-compose up --build
-```
-
-### Manual Docker Build
-
-```bash
-# Build image
-docker build -t boku-ai-assistant .
-
-# Run container
-docker run -p 7871:7871 \
-  -e HF_API_KEY=your_key_here \
-  boku-ai-assistant
-```
-
 ## 🧪 Testing
 
 ```bash
 # Run comprehensive tests
 python test_complete_system.py
-
-# Test specific components
-python -m pytest tests/
 ```
 
 ## 📊 Performance
