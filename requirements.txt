@@ -1,0 +1,13 @@
+# Core dependencies
+gradio>=4.44.0
+faiss-cpu>=1.7.4
+sentence-transformers>=2.2.2
+numpy>=1.21.0
+requests>=2.31.0
+huggingface-hub>=0.20.0
+python-dotenv>=1.0.0
+
+# Optional dependencies for development
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
