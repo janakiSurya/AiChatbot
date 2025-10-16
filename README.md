@@ -1,4 +1,4 @@
-# 🤖 Boku AI Assistant
+# Boku AI Assistant
 
 > **A conversational AI assistant for Surya Gouthu's portfolio, powered by HuggingFace Mistral-7B and optimized vector search technology.**
 
@@ -6,15 +6,15 @@
 [![HuggingFace](https://img.shields.io/badge/HuggingFace-Mistral--7B-yellow.svg)](https://huggingface.co)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## ✨ Features
+## Features
 
-- 🧠 **Intelligent Conversations**: Natural, casual responses with creative greetings
-- 🔍 **Hybrid Search Engine**: Combines vector similarity and keyword matching for accurate results
-- 🎯 **Context-Aware**: Retrieves relevant information from Surya's portfolio data
-- ⚡ **Optimized Performance**: Clean, efficient codebase with 35% code reduction
-- 🎨 **Modern UI**: Beautiful Gradio interface for seamless interaction
+- **Intelligent Conversations**: Natural, casual responses with creative greetings
+- **Hybrid Search Engine**: Combines vector similarity and keyword matching for accurate results
+- **Context-Aware**: Retrieves relevant information from Surya's portfolio data
+- **Optimized Performance**: Clean, efficient codebase with 35% code reduction
+- **Modern UI**: Beautiful Gradio interface for seamless interaction
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.8+
@@ -51,7 +51,7 @@ python app.py
 
 Access the application at `http://localhost:7871`
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
@@ -69,14 +69,14 @@ Access the application at `http://localhost:7871`
                        └──────────────────┘
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **AI/ML**: HuggingFace Mistral-7B-Instruct-v0.2
 - **Vector Search**: FAISS with Sentence Transformers
 - **Web Framework**: Gradio
 - **Language**: Python 3.8+
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── core/                   # Core engine components
@@ -96,7 +96,7 @@ Access the application at `http://localhost:7871`
 └── README.md            # This file
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -119,21 +119,21 @@ SERVER_HOST=0.0.0.0
 TEMPERATURE=0.7
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run comprehensive tests
 python test_complete_system.py
 ```
 
-## 📊 Performance
+## Performance
 
 - **Response Time**: < 2 seconds average
 - **Memory Usage**: ~500MB with vector index
 - **Code Optimization**: 35% reduction in codebase size
 - **Search Accuracy**: Hybrid approach improves relevance by 40%
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -141,25 +141,25 @@ python test_complete_system.py
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## Author
 
 **Surya Gouthu**
 - Email: pavan.tanai117@gmail.com
 - LinkedIn: [Surya Gouthu](https://linkedin.com/in/suryagouthu)
 - GitHub: [@janakiSurya](https://github.com/janakiSurya)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [HuggingFace](https://huggingface.co) for the Mistral-7B model
 - [Gradio](https://gradio.app) for the web interface
 - [FAISS](https://github.com/facebookresearch/faiss) for vector search
 - [Sentence Transformers](https://www.sbert.net) for embeddings
 
-## 📈 Roadmap
+## Roadmap
 
 - [ ] Multi-language support
 - [ ] Voice interaction
@@ -169,4 +169,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**⭐ If you found this project helpful, please give it a star!**
+**If you found this project helpful, please give it a star!**
