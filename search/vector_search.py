@@ -8,7 +8,7 @@ import numpy as np
 import pickle
 import os
 from sentence_transformers import SentenceTransformer
-from config import EMBEDDING_MODEL_NAME, MAX_CONTEXT_LENGTH
+from config import EMBEDDING_MODEL, MAX_TOKENS, logger
 
 
 class VectorSearch:
@@ -16,7 +16,7 @@ class VectorSearch:
     
     def __init__(self):
         """Initialize the vector search system"""
-        self.embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+        self.embedding_model = SentenceTransformer(EMBEDDING_MODEL)
         self.faiss_index = None
         self.documents_data = []
         self.metadatas_data = []
@@ -31,10 +31,10 @@ class VectorSearch:
                 self.documents_data = data['documents']
                 self.metadatas_data = data['metadatas']
             
-            print(f"✅ Loaded FAISS index with {len(self.documents_data)} documents")
+            logger.info(f"✅ Loaded FAISS index with {len(self.documents_data)} documents")
             return True
         except Exception as e:
-            print(f"❌ Failed to load FAISS index: {e}")
+            logger.error(f"❌ Failed to load FAISS index: {e}")
             return False
     
     def create_index(self, portfolio_data):
@@ -54,7 +54,7 @@ class VectorSearch:
         faiss.normalize_L2(embeddings_array)
         self.faiss_index.add(embeddings_array)
         
-        print(f"✅ Created FAISS index with {len(portfolio_data)} documents")
+        logger.info(f"✅ Created FAISS index with {len(portfolio_data)} documents")
     
     def save_index(self, faiss_index_path, data_path):
         """Save FAISS index and data to files"""
@@ -73,7 +73,7 @@ class VectorSearch:
         with open(data_path, 'wb') as f:
             pickle.dump(data, f)
         
-        print(f"✅ Saved FAISS index with {len(self.documents_data)} documents")
+        logger.info(f"✅ Saved FAISS index with {len(self.documents_data)} documents")
     
     def search(self, query, k=10):
         """Perform vector search on the index"""
@@ -94,8 +94,8 @@ class VectorSearch:
             if idx < len(self.documents_data):
                 context = self.documents_data[idx]
                 # Truncate context if too long
-                if len(context) > MAX_CONTEXT_LENGTH:
-                    context = context[:MAX_CONTEXT_LENGTH] + "..."
+                if len(context) > MAX_TOKENS:
+                    context = context[:MAX_TOKENS] + "..."
                 contexts.append(context)
         
         return contexts

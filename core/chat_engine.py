@@ -5,6 +5,7 @@ Optimized for efficiency and clean code
 
 from core.knowledge_base import KnowledgeBase
 from llm.response_generator import ResponseGenerator
+from config import logger
 from utils.query_expander import expand_query, classify_query_intent
 
 
@@ -19,13 +20,13 @@ class ChatEngine:
     
     def initialize(self):
         """Initialize the chat engine"""
-        if self.knowledge_base.initialize():
-            self.is_ready = True
-            print("✅ Chat engine initialized successfully")
-            return True
-        else:
-            print("❌ Failed to initialize chat engine")
+        if not self.knowledge_base.initialize():
+            logger.error("Failed to initialize knowledge base")
             return False
+            
+        self.is_ready = True
+        logger.info("Chat engine initialized successfully")
+        return True
     
     def chat(self, message):
         """Process a chat message and generate response"""
@@ -36,9 +37,9 @@ class ChatEngine:
         expanded_query = expand_query(message)
         query_intent = classify_query_intent(message)
         
-        print(f"Original query: {message}")
-        print(f"Expanded query: {expanded_query}")
-        print(f"Query intent: {query_intent}")
+        logger.info(f"Original query: {message}")
+        logger.info(f"Expanded query: {expanded_query}")
+        logger.info(f"Query intent: {query_intent}")
         
         # Search for relevant contexts
         contexts = self.knowledge_base.search(expanded_query)
@@ -51,7 +52,7 @@ class ChatEngine:
             response = self.response_generator.generate_response(message, contexts)
             return response
         except Exception as e:
-            print(f"Response generation failed: {e}")
+            logger.error(f"Response generation failed: {e}")
             return self._get_fallback_response(contexts)
     
     def _get_fallback_response(self, contexts):

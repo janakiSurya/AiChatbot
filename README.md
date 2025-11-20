@@ -1,9 +1,9 @@
 # Boku AI Assistant
 
-> **A conversational AI assistant for Surya Gouthu's portfolio, powered by HuggingFace Mistral-7B and optimized vector search technology.**
+> **A conversational AI assistant for Surya Gouthu's portfolio, powered by Perplexity AI and optimized vector search technology.**
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![HuggingFace](https://img.shields.io/badge/HuggingFace-Mistral--7B-yellow.svg)](https://huggingface.co)
+[![Perplexity AI](https://img.shields.io/badge/Perplexity-Sonar-purple.svg)](https://perplexity.ai)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## Features
@@ -18,7 +18,7 @@
 
 ### Prerequisites
 - Python 3.8+
-- HuggingFace API key
+- Perplexity AI API key
 
 ### Installation
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 # Configure environment
 cp env.example .env
-# Edit .env with your HuggingFace API key
+# Edit .env with your Perplexity API key
 ```
 
 ### Usage
@@ -64,14 +64,14 @@ Access the application at `http://localhost:7871`
                        ┌──────────────────┐
                        │ Response Generator│
                        │                  │
-                       │  HuggingFace API │
-                       │  Mistral-7B      │
+                       │  Perplexity API  │
+                       │  Sonar Model     │
                        └──────────────────┘
 ```
 
 ## Technology Stack
 
-- **AI/ML**: HuggingFace Mistral-7B-Instruct-v0.2
+- **AI/ML**: Perplexity AI (Sonar Model)
 - **Vector Search**: FAISS with Sentence Transformers
 - **Web Framework**: Gradio
 - **Language**: Python 3.8+
@@ -102,8 +102,8 @@ Access the application at `http://localhost:7871`
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `HF_API_KEY` | HuggingFace API key | Required |
-| `HF_MODEL_NAME` | Model to use | `mistralai/Mistral-7B-Instruct-v0.2` |
+| `PERPLEXITY_API_KEY` | Perplexity API key | Required |
+| `PERPLEXITY_MODEL` | Model to use | `sonar` |
 | `SERVER_PORT` | Web server port | `7871` |
 | `SERVER_HOST` | Web server host | `0.0.0.0` |
 | `TEMPERATURE` | Response creativity | `0.7` |
@@ -112,8 +112,8 @@ Access the application at `http://localhost:7871`
 
 ```bash
 # .env file
-HF_API_KEY=your_huggingface_api_key_here
-HF_MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.2
+PERPLEXITY_API_KEY=your_api_key_here
+PERPLEXITY_MODEL=sonar
 SERVER_PORT=7871
 SERVER_HOST=0.0.0.0
 TEMPERATURE=0.7
@@ -122,6 +122,9 @@ TEMPERATURE=0.7
 ## Testing
 
 ```bash
+# Run minimal test (saves API calls)
+python tests/minimal_test.py
+
 # Run comprehensive tests
 python test_complete_system.py
 ```
@@ -154,7 +157,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [HuggingFace](https://huggingface.co) for the Mistral-7B model
+- [Perplexity AI](https://perplexity.ai) for the Sonar model
 - [Gradio](https://gradio.app) for the web interface
 - [FAISS](https://github.com/facebookresearch/faiss) for vector search
 - [Sentence Transformers](https://www.sbert.net) for embeddings

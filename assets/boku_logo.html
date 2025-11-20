@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .boku-logo {
+            font-family: 'Courier New', monospace;
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #8000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            text-shadow: 0 0 30px #00ffff;
+            letter-spacing: 5px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .ai-subtitle {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            color: #00ffff;
+            text-align: center;
+            margin-top: 10px;
+            opacity: 0.8;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        
+        .circuit-pattern {
+            background-image: 
+                linear-gradient(90deg, transparent 98%, #00ffff 100%),
+                linear-gradient(0deg, transparent 98%, #00ffff 100%);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+        
+        @keyframes glow {
+            from { 
+                text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+                filter: brightness(1);
+            }
+            to { 
+                text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff;
+                filter: brightness(1.2);
+            }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00ff00;
+            animation: pulse 2s infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .container {
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="circuit-pattern"></div>
+        <div class="boku-logo">BOKU AI</div>
+        <div class="ai-subtitle">
+            <span class="status-indicator"></span>
+            Advanced Portfolio Intelligence System
+        </div>
+    </div>
+</body>
+</html>
+

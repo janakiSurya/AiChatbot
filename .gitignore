@@ -63,4 +63,4 @@ flagged/
 htmlcov/
 
 # Documentation
-docs/_build/
+docs/_build/.env.backup

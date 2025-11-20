@@ -6,7 +6,7 @@ Optimized for efficiency
 import os
 from data.portfolio_data import get_portfolio_data
 from search.hybrid_search import HybridSearch
-from config import FAISS_INDEX_PATH, FAISS_DATA_PATH
+from config import FAISS_INDEX_PATH, FAISS_DATA_PATH, logger
 
 
 class KnowledgeBase:
@@ -27,19 +27,19 @@ class KnowledgeBase:
                     faiss_index_path=FAISS_INDEX_PATH,
                     data_path=FAISS_DATA_PATH
                 )
-                print("✅ Loaded existing knowledge base")
+                logger.info("✅ Loaded existing knowledge base")
             else:
                 # Create new index from portfolio data
                 portfolio_data = get_portfolio_data()
                 self.search_engine.initialize(portfolio_data=portfolio_data)
                 self.search_engine.save_index(FAISS_INDEX_PATH, FAISS_DATA_PATH)
-                print("✅ Created new knowledge base")
+                logger.info("✅ Created new knowledge base")
             
             self.is_initialized = True
             return True
             
         except Exception as e:
-            print(f"❌ Failed to initialize knowledge base: {e}")
+            logger.error(f"❌ Failed to initialize knowledge base: {e}")
             return False
     
     def search(self, query, k=10):
