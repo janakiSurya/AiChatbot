@@ -20,7 +20,7 @@ Make sure your latest code (including `api.py` and `requirements.txt`) is pushed
 4.  Configure the service:
     - **Name**: `boku-ai-backend` (or similar)
     - **Runtime**: `Python 3`
-    - **Build Command**: `pip install -r requirements.txt`
+    - **Build Command**: `pip install --upgrade pip && pip install -r requirements.txt`
     - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
     - **Instance Type**: `Free`
 
