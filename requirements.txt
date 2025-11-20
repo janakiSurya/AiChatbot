@@ -1,6 +1,10 @@
+# Build dependencies (must be first)
+setuptools>=65.0.0
+wheel>=0.38.0
+
 # Core dependencies
 gradio>=4.44.0
-faiss-cpu>=1.7.4
+faiss-cpu==1.8.0
 sentence-transformers>=2.2.2
 numpy>=1.21.0
 requests>=2.31.0
