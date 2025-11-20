@@ -1,20 +1,29 @@
 # Build dependencies (must be first)
-setuptools>=65.0.0
-wheel>=0.38.0
+setuptools==65.5.1
+wheel==0.38.4
 
-# Core dependencies
-gradio>=4.44.0
+# Core ML/AI dependencies (order matters!)
 numpy==1.23.5
-faiss-cpu==1.8.0
+torch==2.0.1
+torchvision==0.15.2
 sentence-transformers==2.2.2
-huggingface-hub>=0.19.0,<1.0
-requests>=2.31.0
-python-dotenv>=1.0.0
-fastapi>=0.104.0
-uvicorn>=0.24.0
-slowapi>=0.1.9
+huggingface-hub==0.19.4
+transformers==4.35.2
 
-# Optional dependencies for development
-pytest>=7.0.0
-black>=23.0.0
-flake8>=6.0.0
+# Vector database
+faiss-cpu==1.7.4
+
+# Web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Rate limiting
+slowapi==0.1.9
+
+# Utilities
+requests==2.31.0
+python-dotenv==1.0.0
+
+# UI (optional - not needed for API)
+gradio==4.44.0
