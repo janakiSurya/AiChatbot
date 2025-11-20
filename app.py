@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Boku - Surya Gouthu's AI Portfolio Assistant
+Alfred - Surya Gouthu's AI Portfolio Assistant
 Main application with refined, clean UI
 """
 
@@ -158,7 +158,7 @@ def create_gradio_interface():
     """
     
     with gr.Blocks(
-        title="Boku AI Assistant - Surya's Portfolio",
+        title="Alfred AI Assistant - Surya's Portfolio",
         css=custom_css,
         theme=gr.themes.Soft()
     ) as demo:
@@ -168,7 +168,7 @@ def create_gradio_interface():
         <div class="header-section">
             <div class="logo-container">
                 <div>
-                    <h1 class="title">Boku AI Assistant</h1>
+                    <h1 class="title">Alfred AI Assistant</h1>
                     <p class="subtitle">
                         <span class="status-indicator"></span>
                         Advanced Portfolio Intelligence System
@@ -183,7 +183,7 @@ def create_gradio_interface():
             chatbot = gr.Chatbot(
                 height=450,
                 type="messages",
-                label="Chat with Boku",
+                label="Chat with Alfred",
                 container=True,
                 show_copy_button=True,
                 avatar_images=("Boku.png", "Boku.png")
@@ -232,13 +232,13 @@ def health_check():
 
 def main():
     """Main application entry point"""
-    print("🚀 Starting Boku AI Assistant (UI Frontend)...")
+    print("🚀 Starting Alfred AI Assistant (UI Frontend)...")
     print(f"📡 Connecting to Backend API at: {API_URL}")
     
     # Create and launch refined Gradio interface
     demo = create_gradio_interface()
     
-    print("✅ Boku AI Assistant UI ready!")
+    print("✅ Alfred AI Assistant UI ready!")
     print("🌐 Access the interface at: http://localhost:7871")
     
     # Launch with refined settings

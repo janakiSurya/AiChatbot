@@ -14,7 +14,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Boku AI Assistant API",
+    title="Alfred AI Assistant API",
     description="Backend API for Surya Gouthu's Portfolio Assistant",
     version="1.0.0"
 )
@@ -47,7 +47,7 @@ class ChatResponse(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize the chat engine on startup"""
-    logger.info("🚀 Starting up Boku API...")
+    logger.info("🚀 Starting up Alfred API...")
     
     if not validate_config():
         logger.error("❌ Invalid configuration. Exiting.")
@@ -62,7 +62,7 @@ async def startup_event():
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"status": "online", "service": "Boku AI Assistant"}
+    return {"status": "online", "service": "Alfred AI Assistant"}
 
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("5/hour")
