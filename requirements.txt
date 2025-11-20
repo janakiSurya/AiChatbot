@@ -4,9 +4,9 @@ wheel>=0.38.0
 
 # Core dependencies
 gradio>=4.44.0
+numpy==1.23.5
 faiss-cpu==1.8.0
 sentence-transformers>=2.2.2
-numpy>=1.21.0
 requests>=2.31.0
 python-dotenv>=1.0.0
 fastapi>=0.104.0
