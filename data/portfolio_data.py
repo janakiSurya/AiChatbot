@@ -137,14 +137,14 @@ def get_portfolio_data():
             }
         },
         {
-            "id": "experience_acer_america_current",
-            "text": "Surya currently works at Acer America, USA as a Full Stack & GenAI Developer since July 2024. In this role, he integrated OpenAI GPT-4 into internal support tools, reducing response times by 42% and automating over 30% of Tier-1 customer service queries. He engineered a Generative AI-powered internal knowledge assistant using LangChain, Pinecone, and React, streamlining access to technical documentation across departments. He developed modular AI microservices using Node.js, NestJS, and Docker, enabling scalable LLM-based workflows and seamless API integration. He collaborated with product and UX teams to embed AI-driven features like smart summarization, predictive text, and language translation into customer-facing applications. He deployed GenAI pipelines with prompt templates and embedding optimization, achieving an 18% cost reduction in API usage through token efficiency. He mentored 3+ junior engineers in LLM integration, prompt engineering, and ethical AI development practices across cross-functional teams.",
+            "id": "experience_acer_overview",
+            "text": "Surya currently works at Acer America, USA as a Full Stack & GenAI Developer since July 2024. He focuses on integrating Generative AI capabilities into enterprise applications and building scalable AI-powered solutions.",
             "metadata": {
                 "category": "experience",
                 "document_type": "resume",
                 "date": "2024-07",
                 "recency": "current",
-                "keywords": ["acer", "america", "genai", "developer", "gpt4", "openai", "langchain", "pinecone", "react", "nodejs", "nestjs", "docker", "microservices", "llm", "prompt engineering", "mentoring"],
+                "keywords": ["acer", "america", "full stack", "genai", "developer", "current", "2024"],
                 "priority": "high",
                 "company": "Acer America",
                 "role": "Full Stack & GenAI Developer",
@@ -152,18 +152,83 @@ def get_portfolio_data():
             }
         },
         {
-            "id": "experience_mindtree_previous",
-            "text": "Surya worked at Mindtree as a Software Engineer from February 2020 to July 2022. During this time, he developed and maintained enterprise-grade web applications using Java, Spring Boot, and Angular, resulting in a 40% reduction in application response time. He built and optimized RESTful APIs for seamless integration with third-party systems, processing over 100,000 daily transactions with 99.9% reliability. He designed and implemented batch processing systems using Spring Batch and MySQL, improving data processing efficiency by 50%. He wrote unit, integration, and UI tests using JUnit, Mockito, and Selenium, improving test reliability and application stability. He deployed and managed cloud-based applications using AWS services including EC2, S3, and RDS to ensure scalability and availability. He participated in code reviews and pair programming, contributing to improved code quality and team knowledge sharing. He coordinated with QA, DevOps, and business teams to troubleshoot and resolve production issues in a timely and efficient manner.",
+            "id": "experience_acer_genai_work",
+            "text": "At Acer America, Surya integrated OpenAI GPT-4 into internal support tools, reducing response times by 42% and automating over 30% of Tier-1 customer service queries. He engineered a Generative AI-powered internal knowledge assistant using LangChain, Pinecone, and React, streamlining access to technical documentation across departments. He deployed GenAI pipelines with prompt templates and embedding optimization, achieving an 18% cost reduction in API usage through token efficiency.",
+            "metadata": {
+                "category": "experience",
+                "document_type": "resume",
+                "date": "2024-07",
+                "recency": "current",
+                "keywords": ["acer", "genai", "gpt-4", "gpt4", "openai", "langchain", "pinecone", "rag", "llm", "ai", "chatbot", "knowledge assistant"],
+                "priority": "high",
+                "company": "Acer America"
+            }
+        },
+        {
+            "id": "experience_acer_microservices",
+            "text": "At Acer, Surya developed modular AI microservices using Node.js, NestJS, and Docker, enabling scalable LLM-based workflows and seamless API integration. He collaborated with product and UX teams to embed AI-driven features like smart summarization, predictive text, and language translation into customer-facing applications. He mentored 3+ junior engineers in LLM integration, prompt engineering, and ethical AI development practices.",
+            "metadata": {
+                "category": "experience",
+                "document_type": "resume",
+                "date": "2024-07",
+                "recency": "current",
+                "keywords": ["acer", "microservices", "nodejs", "nestjs", "docker", "api", "mentoring", "prompt engineering"],
+                "priority": "high",
+                "company": "Acer America"
+            }
+        },
+        {
+            "id": "experience_mindtree_overview",
+            "text": "Surya worked at Mindtree as a Software Engineer from February 2020 to July 2022. He developed enterprise-grade web applications using Java, Spring Boot, and Angular, resulting in a 40% reduction in application response time.",
             "metadata": {
                 "category": "experience",
                 "document_type": "resume",
                 "date": "2020-02",
                 "recency": "past",
-                "keywords": ["mindtree", "software engineer", "java", "spring boot", "angular", "restful", "apis", "spring batch", "mysql", "junit", "mockito", "selenium", "aws", "ec2", "s3", "rds", "testing", "devops"],
+                "keywords": ["mindtree", "software engineer", "java", "spring boot", "angular", "enterprise"],
                 "priority": "high",
                 "company": "Mindtree",
                 "role": "Software Engineer",
                 "duration": "February 2020 - July 2022"
+            }
+        },
+        {
+            "id": "experience_mindtree_aws",
+            "text": "At Mindtree, Surya deployed and managed cloud-based applications using AWS services including EC2, S3, and RDS to ensure scalability and availability. He worked on cloud infrastructure and deployment pipelines.",
+            "metadata": {
+                "category": "experience",
+                "document_type": "resume",
+                "date": "2020-02",
+                "recency": "past",
+                "keywords": ["mindtree", "aws", "ec2", "s3", "rds", "cloud", "deployment", "infrastructure"],
+                "priority": "high",
+                "company": "Mindtree"
+            }
+        },
+        {
+            "id": "experience_mindtree_apis",
+            "text": "At Mindtree, Surya built and optimized RESTful APIs for seamless integration with third-party systems, processing over 100,000 daily transactions with 99.9% reliability. He designed and implemented batch processing systems using Spring Batch and MySQL, improving data processing efficiency by 50%.",
+            "metadata": {
+                "category": "experience",
+                "document_type": "resume",
+                "date": "2020-02",
+                "recency": "past",
+                "keywords": ["mindtree", "restful", "api", "spring batch", "mysql", "batch processing", "integration"],
+                "priority": "high",
+                "company": "Mindtree"
+            }
+        },
+        {
+            "id": "experience_mindtree_testing",
+            "text": "At Mindtree, Surya wrote unit, integration, and UI tests using JUnit, Mockito, and Selenium, improving test reliability and application stability. He participated in code reviews and pair programming, contributing to improved code quality and team knowledge sharing. He coordinated with QA, DevOps, and business teams to troubleshoot and resolve production issues.",
+            "metadata": {
+                "category": "experience",
+                "document_type": "resume",
+                "date": "2020-02",
+                "recency": "past",
+                "keywords": ["mindtree", "testing", "junit", "mockito", "selenium", "code review", "qa", "devops"],
+                "priority": "high",
+                "company": "Mindtree"
             }
         },
         {
@@ -267,6 +332,30 @@ def get_portfolio_data():
                 "field": "Computer Science and Engineering",
                 "institution": "Jawaharlal Nehru Technological University, Kakinada",
                 "duration": "August 2016 - June 2020"
+            }
+        },
+        {
+            "id": "achievements_highlights",
+            "text": "Surya's key achievements include a 42% reduction in response times at Acer America through GPT-4 integration, a 40% improvement in application performance during his Mindtree tenure, 50% data processing efficiency gains via batch optimization, and an 18% cost reduction in API usage through token optimization. He also automated 30% of Tier-1 customer service queries.",
+            "metadata": {
+                "category": "achievements",
+                "document_type": "resume",
+                "date": "2024-10",
+                "recency": "current",
+                "keywords": ["achievements", "accomplishments", "results", "metrics", "impact", "42%", "40%", "50%", "18%", "30%", "reduction", "improvement", "optimization"],
+                "priority": "high"
+            }
+        },
+        {
+            "id": "personal_interests",
+            "text": "Surya is passionate about AI/ML research, open-source contributions, and staying updated with emerging technologies. He enjoys building side projects, exploring new frameworks, and mentoring fellow developers in the tech community.",
+            "metadata": {
+                "category": "interests",
+                "document_type": "personal",
+                "date": "2024-10",
+                "recency": "current",
+                "keywords": ["interests", "hobbies", "passion", "ai", "ml", "research", "open source", "side projects", "mentoring", "community"],
+                "priority": "medium"
             }
         },
         {
