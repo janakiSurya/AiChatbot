@@ -4,6 +4,7 @@ Optimized for natural conversation and efficient processing
 """
 
 import time
+import datetime
 import random
 import requests
 import re
@@ -158,6 +159,10 @@ EXAMPLES:
 - Instead of: "He works at Acer America..."
 - Say: "He's currently stationed at Acer America, optimizing their systems with GenAI. ⚡"
 """
+        
+        # Add current date context
+        current_date = datetime.datetime.now().strftime("%B %Y")
+        system_message += f"\n\nCURRENT DATE: {current_date}"
         
         messages = [
             {"role": "system", "content": system_message}

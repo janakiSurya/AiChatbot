@@ -320,13 +320,13 @@ def get_portfolio_data():
         },
         {
             "id": "research_masters_thesis",
-            "text": "Surya authored a Master's thesis titled 'Movie Review Prediction Using Twitter Data Analysis' at California State University, Northridge (MS in Computer Science). The research focuses on sentiment analysis using machine learning, comparing models like VADER, AFINN, BERT, and RoBERTa for analyzing Twitter data. The study analyzed tweets for nine movies over 2-6 months, evaluating neural networks (RNN, CNN) and transformer architectures. Key findings showed transformer models (BERT, RoBERTa) achieved superior precision and recall across sentiment categories. The thesis is published on CSU ScholarWorks at scholarworks.calstate.edu/downloads/n8710030s and demonstrates expertise in NLP, sentiment analysis, machine learning, and social media data analysis.",
+            "text": "Surya authored a Master's thesis titled 'Movie Review Prediction Using Twitter Data Analysis' at California State University, Northridge (MS in Computer Science). The research focuses on sentiment analysis using machine learning, comparing models like VADER, AFINN, BERT, and RoBERTa for analyzing Twitter data. The study analyzed tweets for nine movies over 2-6 months, evaluating neural networks (RNN, CNN) and transformer architectures. Key findings showed transformer models (BERT, RoBERTa) achieved superior precision and recall across sentiment categories. This research directly relates to his current work at Acer integrating GenAI and LLMs, as both involve NLP, transformer models, and AI-powered text analysis. The thesis is published on CSU ScholarWorks at scholarworks.calstate.edu/downloads/n8710030s and demonstrates expertise in NLP, sentiment analysis, machine learning, and social media data analysis.",
             "metadata": {
                 "category": "education",
                 "document_type": "research",
                 "date": "2024-05",
                 "recency": "recent",
-                "keywords": ["thesis", "research", "sentiment analysis", "machine learning", "nlp", "bert", "roberta", "vader", "afinn", "twitter", "social media", "neural networks", "transformers", "publication", "masters", "scholarworks"],
+                "keywords": ["thesis", "research", "sentiment analysis", "machine learning", "nlp", "bert", "roberta", "vader", "afinn", "twitter", "social media", "neural networks", "transformers", "publication", "masters", "scholarworks", "california scholars"],
                 "priority": "high",
                 "institution": "California State University, Northridge",
                 "link": "https://scholarworks.calstate.edu/downloads/n8710030s"
@@ -369,7 +369,7 @@ def get_portfolio_data():
                 "date": "2024-10",
                 "recency": "current",
                 "keywords": ["interests", "hobbies", "passion", "ai", "ml", "research", "open source", "side projects", "mentoring", "community"],
-                "priority": "medium"
+                "priority": "low"
             }
         },
         {
@@ -396,6 +396,79 @@ def get_portfolio_data():
                 "recency": "current",
                 "keywords": ["specializations", "full stack", "genai", "rag", "llm", "microservices", "cloud", "deployment", "scalable", "enterprise", "ai", "technologies"],
                 "priority": "high"
+            }
+        },
+        {
+            "id": "certifications_list",
+            "text": "Surya is an AWS Certified Developer - Practitioner and holds a Microsoft Technology Associate (MTA) certification in Python, validating his expertise in cloud development and programming fundamentals. His AWS certification directly supports his professional work deploying cloud-based applications at Mindtree using EC2, S3, and RDS.",
+            "metadata": {
+                "category": "certifications",
+                "document_type": "resume",
+                "date": "2024",
+                "recency": "current",
+                "keywords": ["certifications", "aws", "certified developer", "practitioner", "microsoft", "mta", "python", "cloud"],
+                "priority": "high"
+            }
+        },
+        {
+            "id": "volunteering_leadership",
+            "text": "Surya has significant leadership experience outside his technical roles. He served as Community Lead at the ACM CSUN Club (Jan 2022 - Present), where he conducted technical and soft-skills training for over 300 students. He was also an Event Organizer at GVP College of Engineering in India, where he organized events and delivered workshops reaching over 300 developers. These leadership roles demonstrate his ability to mentor, organize, and lead teams beyond just coding.",
+            "metadata": {
+                "category": "volunteering",
+                "document_type": "resume",
+                "date": "2024",
+                "recency": "current",
+                "keywords": ["volunteering", "leadership", "acm", "csun", "club", "community lead", "training", "gvp college", "event organizer", "workshops", "mentoring"],
+                "priority": "high"
+            }
+        },
+        {
+            "id": "languages_spoken",
+            "text": "Surya is multilingual and proficient in English, Telugu, and Hindi. Telugu and Hindi are major Indian languages, allowing him to communicate effectively with teams in India in their native tongues.",
+            "metadata": {
+                "category": "languages",
+                "document_type": "resume",
+                "date": "2024",
+                "recency": "current",
+                "keywords": ["languages", "english", "telugu", "hindi", "multilingual", "communication", "india", "indian", "native"],
+                "priority": "medium"
+            }
+        },
+        {
+            "id": "awards_hackathon",
+            "text": "In 2025, Surya achieved a Top 5 placement in the AIEEE AI Agent Hackathon, showcasing his expertise in building autonomous AI agents and innovative problem-solving skills.",
+            "metadata": {
+                "category": "awards",
+                "document_type": "resume",
+                "date": "2025",
+                "recency": "recent",
+                "keywords": ["awards", "hackathon", "aieee", "ai agent", "top 5", "competition", "innovation"],
+                "priority": "high"
+            }
+        },
+
+        {
+            "id": "education_masters_coursework",
+            "text": "During his Master's degree, Surya completed advanced coursework in Data Structures and Algorithms (DSA), Advanced Web Engineering, Machine Learning, Artificial Intelligence, and Cloud Computing, building a strong theoretical foundation for his practical skills.",
+            "metadata": {
+                "category": "education",
+                "document_type": "resume",
+                "date": "2024",
+                "recency": "recent",
+                "keywords": ["coursework", "dsa", "web engineering", "machine learning", "ai", "cloud computing", "masters"],
+                "priority": "high"
+            }
+        },
+        {
+            "id": "personal_interests_detailed",
+            "text": "Surya is an avid gamer with over 2000 hours in Dota 2, demonstrating exceptional dedication and commitment. He also enjoys playing cricket, badminton, basketball, and ping pong, and is a movie enthusiast. His gaming dedication reflects the same persistence and strategic thinking he applies to complex technical challenges.",
+            "metadata": {
+                "category": "interests",
+                "document_type": "personal",
+                "date": "2024-10",
+                "recency": "current",
+                "keywords": ["interests", "hobbies", "gaming", "dota 2", "cricket", "badminton", "basketball", "ping pong", "movies", "dedication", "commitment", "persistence"],
+                "priority": "medium"
             }
         }
     ]

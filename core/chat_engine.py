@@ -55,8 +55,8 @@ class ChatEngine:
         logger.info(f"Expanded query: {expanded_query}")
         logger.info(f"Query intent: {query_intent}")
         
-        # Search for relevant contexts
-        contexts = self.knowledge_base.search(expanded_query)
+        # Search for relevant contexts (increased k for better coverage)
+        contexts = self.knowledge_base.search(expanded_query, k=15)
         
         if not contexts:
             return "I don't have enough information to answer that question about Surya's portfolio. Please try asking about his skills, experience, projects, education, or contact information."
