@@ -7,6 +7,42 @@ def expand_query(query, history=None):
     """Expand query with synonyms and related terms for better search"""
     query_lower = query.lower()
     
+    # Handle short queries (likely follow-up questions) using history
+    if history and len(history) >= 2 and len(query.split()) <= 3:
+        # Get the last user query and assistant response from history
+        last_user_query = None
+        last_assistant_response = None
+        
+        for msg in reversed(history):
+            if msg['role'] == 'user' and not last_user_query:
+                last_user_query = msg['content']
+            elif msg['role'] == 'assistant' and not last_assistant_response:
+                last_assistant_response = msg['content']
+            
+            if last_user_query and last_assistant_response:
+                break
+        
+        # If query is very short (1-3 words), it's likely a follow-up
+        if last_user_query:
+            # Extract key entities from last query and response
+            entities = []
+            
+            # Check for company names in history
+            for company in ['acer', 'mindtree', 'tata']:
+                if company in last_user_query.lower() or (last_assistant_response and company in last_assistant_response.lower()):
+                    entities.append(company)
+            
+            # Check for topics in history
+            topics = ['thesis', 'research', 'project', 'certification', 'skill', 'work', 'education']
+            for topic in topics:
+                if topic in last_user_query.lower():
+                    entities.append(topic)
+            
+            # Combine with current query if entities found
+            if entities:
+                query = f"{' '.join(entities)} {query}"
+                query_lower = query.lower()
+    
     # Handle pronouns using history
     if history and len(history) >= 2:
         # Check for pronouns
