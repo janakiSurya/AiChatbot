@@ -18,6 +18,8 @@ class ChatEngine:
         self.knowledge_base = KnowledgeBase()
         self.response_generator = ResponseGenerator()
         self.semantic_cache = SemanticCache()
+        self.history = []  # Store conversation history
+        self.max_history = 5  # Keep last 5 turns
         self.is_ready = False
     
     def initialize(self):
@@ -45,8 +47,8 @@ class ChatEngine:
         if cached_response:
             return cached_response
         
-        # Expand query for better search results
-        expanded_query = expand_query(message)
+        # Expand query for better search results using history
+        expanded_query = expand_query(message, self.history)
         query_intent = classify_query_intent(message)
         
         logger.info(f"Original query: {message}")
@@ -59,12 +61,20 @@ class ChatEngine:
         if not contexts:
             return "I don't have enough information to answer that question about Surya's portfolio. Please try asking about his skills, experience, projects, education, or contact information."
         
-        # Generate response using LLM
+        # Generate response using LLM with history
         try:
-            response = self.response_generator.generate_response(message, contexts)
+            response = self.response_generator.generate_response(message, contexts, history=self.history)
             
             # Add to dynamic cache for future use
             self.semantic_cache.add_to_dynamic_cache(message, response)
+            
+            # Update history
+            self.history.append({"role": "user", "content": message})
+            self.history.append({"role": "assistant", "content": response})
+            
+            # Trim history if needed
+            if len(self.history) > self.max_history * 2:
+                self.history = self.history[-self.max_history * 2:]
             
             return response
         except Exception as e:

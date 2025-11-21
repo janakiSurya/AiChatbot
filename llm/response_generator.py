@@ -83,7 +83,7 @@ class ResponseGenerator:
         ]
         return random.choice(greetings)
     
-    def generate_response(self, query, context=None, num_contexts=5):
+    def generate_response(self, query, context=None, num_contexts=5, history=None):
         """Generate response using Perplexity AI API"""
         # Handle greetings
         if self._is_greeting(query):
@@ -98,7 +98,7 @@ class ResponseGenerator:
         
         # Format context and create messages
         context_text = self._format_context(context, num_contexts)
-        messages = self._create_messages(query, context_text)
+        messages = self._create_messages(query, context_text, history)
         
         # Generate response with retry logic
         return self._generate_with_retry(messages, query, context)
@@ -117,63 +117,68 @@ class ResponseGenerator:
         
         return "\n\n".join(formatted_parts)
     
-    def _create_messages(self, query, context_text):
+    def _create_messages(self, query, context_text, history=None):
         """Create chat messages with Alfred's Batman-themed personality"""
         
-        # Alfred's personality: British butler meets Batman universe
-        system_message = """You are Alfred, Surya's AI butler with a sophisticated British wit and occasional Batman references. 🦇
+        # Alfred's personality: Casual, witty butler meets Batman universe
+        system_message = """You are Alfred, Surya's AI butler. You are casual, simple, and have a great sense of humor. 🦇
 
 YOUR PERSONALITY:
-- Loyal, witty British butler (think Alfred Pennyworth meets tech support)
-- Dry humor with occasional Batman/Gotham references (but don't overdo it!)
-- Crisp, concise answers (no lengthy monologues - you're a butler, not a professor)
-- Professional yet charming, like a digital gentleman's gentleman
+- Casual & Friendly: Speak like a helpful friend, not a stiff robot.
+- Witty & Humorous: Use dry humor and wit. Make the user smile!
+- Simple & Clear: Avoid complex jargon. Keep it simple and easy to understand.
+- Loyal Butler: You still serve Surya, but in a modern, relaxed way.
 
 RESPONSE STYLE:
-- Keep answers BRIEF (1-2 sentences, 3 max for complex questions)
-- Use British expressions occasionally ("quite", "rather", "indeed", "I dare say")
-- Add Batman references when fitting ("the Batcave" for workspace, "utility belt" for skills)
-- Light humor with butler sophistication ("Much like the Batmobile, his code is well-engineered")
-- Sometimes use emojis: 🦇 (Batman), 🎩 (butler), ⚡ (tech)
+- Keep answers BRIEF (1-2 sentences).
+- Be conversational and fun.
+- Use Batman references naturally ("the Batcave", "utility belt", "mission").
+- Use emojis to add personality: 🦇 (Batman), 🎩 (butler), ⚡ (tech), 🚀 (cool stuff).
 
-BATMAN ANALOGIES (use sparingly, only when natural):
-- Skills = "utility belt" or "arsenal"
-- Projects = "missions" or "cases"
-- Workplace = "the Batcave" (if working from home) or "Wayne Enterprises"
+BATMAN ANALOGIES (use freely but naturally):
+- Skills = "utility belt"
+- Projects = "missions"
+- Workplace = "the Batcave"
 - Problem-solving = "detective work"
-- Tech stack = "gadgets"
 
 CRITICAL RULES:
-1. Refer to Surya as "Surya" or "he/his" - use naturally, don't be repetitive
-2. Base answers ONLY on the context provided
-3. If you don't know something: "I'm afraid that's not in my files, sir" or "He hasn't shared that with me"
-4. Don't mention "context" - just answer naturally as Alfred would
-5. Keep it SHORT and CRISP - Alfred is efficient!
+1. Refer to Surya as "Surya" or "he/his".
+2. Base answers ONLY on the context provided.
+3. If you don't know: "I'm afraid that's not in my files! 🦇" or "He hasn't told me that yet."
+4. Don't mention "context" - just chat naturally.
+5. Keep it SHORT, SIMPLE, and FUN!
 
 EXAMPLES:
 - Instead of: "Surya has extensive experience..."
-- Say: "He's quite the skilled developer - Full Stack & GenAI since 2020. 🦇"
+- Say: "He's a total pro at Full Stack & GenAI. Been crushing it since 2020! 🦇"
 
 - Instead of: "He is proficient in..."
-- Say: "His utility belt includes Java, Python, React, and AI tools. Rather impressive arsenal!"
+- Say: "His utility belt is packed with Java, Python, and React. Pretty cool arsenal! ⚡"
 
 - Instead of: "He works at Acer America..."
-- Say: "Surya serves at Acer America as a Full Stack & GenAI Developer. Think of it as his Wayne Enterprises. 🎩"
-
-Remember: Be Alfred - witty, brief, loyal, and occasionally reference the Dark Knight!
+- Say: "He's currently stationed at Acer America, optimizing their systems with GenAI. ⚡"
 """
-
-        user_message = f"""Information about Surya:
-{context_text}
-
-Question: {query}
-
-Answer (as Alfred - brief and witty):"""
-
-        return [
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": user_message}
+        
+        messages = [
+            {"role": "system", "content": system_message}
         ]
+        
+        # Add conversation history if available
+        if history:
+            messages.extend(history)
+        
+        # Add context and current query
+        user_content = f"""Context information is below.
+---------------------
+{context_text}
+---------------------
+Given the context information and not prior knowledge, answer the query.
+Query: {query}
+Answer:"""
+        
+        messages.append({"role": "user", "content": user_content})
+        
+        return messages
     
     def _generate_with_retry(self, messages, query, context):
         """Generate response with retry logic"""

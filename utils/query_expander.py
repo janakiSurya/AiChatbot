@@ -3,9 +3,26 @@ Query expansion utilities for better search results
 Optimized and consolidated
 """
 
-def expand_query(query):
+def expand_query(query, history=None):
     """Expand query with synonyms and related terms for better search"""
     query_lower = query.lower()
+    
+    # Handle pronouns using history
+    if history and len(history) >= 2:
+        # Check for pronouns
+        pronouns = [' it ', ' that ', ' he ', ' his ', ' she ', ' her ', ' they ', ' them ', ' there ']
+        if any(p in f" {query_lower} " for p in pronouns):
+            # Get the last user query from history
+            last_user_query = None
+            for msg in reversed(history):
+                if msg['role'] == 'user':
+                    last_user_query = msg['content']
+                    break
+            
+            if last_user_query:
+                # Combine last query with current query for context
+                query = f"{last_user_query} {query}"
+                query_lower = query.lower()
     
     # Query expansion mappings
     expansions = {

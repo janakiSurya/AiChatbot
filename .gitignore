@@ -32,6 +32,8 @@ wheels/
 # Data files
 data/faiss_index.bin
 data/faiss_data.pkl
+faiss_index.bin
+faiss_data.pkl
 *.log
 
 # ChromaDB

@@ -319,6 +319,20 @@ def get_portfolio_data():
             }
         },
         {
+            "id": "research_masters_thesis",
+            "text": "Surya authored a Master's thesis titled 'Movie Review Prediction Using Twitter Data Analysis' at California State University, Northridge (MS in Computer Science). The research focuses on sentiment analysis using machine learning, comparing models like VADER, AFINN, BERT, and RoBERTa for analyzing Twitter data. The study analyzed tweets for nine movies over 2-6 months, evaluating neural networks (RNN, CNN) and transformer architectures. Key findings showed transformer models (BERT, RoBERTa) achieved superior precision and recall across sentiment categories. The thesis is published on CSU ScholarWorks at scholarworks.calstate.edu/downloads/n8710030s and demonstrates expertise in NLP, sentiment analysis, machine learning, and social media data analysis.",
+            "metadata": {
+                "category": "education",
+                "document_type": "research",
+                "date": "2024-05",
+                "recency": "recent",
+                "keywords": ["thesis", "research", "sentiment analysis", "machine learning", "nlp", "bert", "roberta", "vader", "afinn", "twitter", "social media", "neural networks", "transformers", "publication", "masters", "scholarworks"],
+                "priority": "high",
+                "institution": "California State University, Northridge",
+                "link": "https://scholarworks.calstate.edu/downloads/n8710030s"
+            }
+        },
+        {
             "id": "education_bachelors_degree",
             "text": "Surya earned a Bachelor of Technology in Computer Science and Engineering from Jawaharlal Nehru Technological University, Kakinada, India from August 2016 to June 2020.",
             "metadata": {
