@@ -146,10 +146,15 @@ class SemanticCache:
                 return response
         
         # Second, check dynamic cache (learned from traffic)
+        max_dynamic_similarity = 0.0
+        
         for cached_query, (cached_embedding, cached_response, access_count) in self.dynamic_cache.items():
             similarity = np.dot(cached_embedding, query_embedding) / (
                 np.linalg.norm(cached_embedding) * np.linalg.norm(query_embedding)
             )
+            
+            if similarity > max_dynamic_similarity:
+                max_dynamic_similarity = similarity
             
             if similarity >= self.similarity_threshold:
                 logger.info(f"✅ Dynamic cache hit (similarity: {similarity:.2f}, accessed {access_count} times)")
@@ -160,7 +165,7 @@ class SemanticCache:
                 
                 return cached_response
         
-        logger.info("❌ Cache miss")
+        logger.info(f"❌ Cache miss (max similarity: {max_dynamic_similarity:.2f})")
         return None
     
     def add_to_dynamic_cache(self, query: str, response: str):
@@ -174,10 +179,12 @@ class SemanticCache:
         """
         # Don't cache very short or very long responses
         if len(response) < 50 or len(response) > 1000:
+            logger.info(f"⚠️ Not caching: response length {len(response)} outside limits")
             return
         
         # Don't cache error messages
         if "error" in response.lower() or "sorry" in response.lower():
+            logger.info("⚠️ Not caching: response contains error/apology")
             return
         
         query_embedding = self.model.encode([query])[0]
@@ -188,6 +195,7 @@ class SemanticCache:
                 np.linalg.norm(cached_embedding) * np.linalg.norm(query_embedding)
             )
             if similarity >= 0.95:  # Very similar, don't add duplicate
+                logger.info(f"⚠️ Not caching: similar query exists (similarity: {similarity:.2f})")
                 return
         
         # Add to cache
