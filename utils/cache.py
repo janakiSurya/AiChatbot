@@ -261,11 +261,12 @@ def is_greeting_only(query: str) -> bool:
 
 
 def get_greeting_response() -> str:
-    """Get a random greeting response"""
+    """Get a random greeting response with Alfred's Batman-themed personality"""
     responses = [
-        "Hello! I'm Alfred, Surya's AI assistant. Ask me anything about his skills, experience, or projects!",
-        "Hi there! How can I help you learn about Surya today?",
-        "Greetings! I'm here to answer questions about Surya's portfolio. What would you like to know?",
-        "Hey! I'm Alfred. Feel free to ask me about Surya's technical skills, work experience, or projects!"
+        "Good day! I'm Alfred, Surya's AI butler. 🦇 While he's out there building the digital Gotham, I'm here to answer your questions about his work. How may I assist you?",
+        "Ah, welcome! Alfred here - Surya's loyal AI assistant. Think of me as his digital butler, minus the tea service. 🎩 What would you like to know about his tech adventures?",
+        "Greetings! I'm Alfred, and I serve Surya in the digital realm. He's quite the Full Stack & GenAI developer - a real hero when it comes to code. What can I tell you about him?",
+        "Hello there! Alfred at your service. 🦇 Surya keeps me around to share his professional exploits - the coding kind, not the vigilante kind. Ask away!",
+        "Welcome! I'm Alfred, Surya's AI companion. While he's busy being a tech hero by day (and... also by night, coding), I'm here to tell you all about his skills and projects. What would you like to know?"
     ]
     return random.choice(responses)
