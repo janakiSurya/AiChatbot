@@ -1,21 +1,23 @@
 """
-Main chat engine that orchestrates search and response generation
-Optimized for efficiency and clean code
+Chat engine for Alfred AI Assistant
+Orchestrates the conversation flow with caching and greeting detection
 """
 
 from core.knowledge_base import KnowledgeBase
 from llm.response_generator import ResponseGenerator
 from config import logger
 from utils.query_expander import expand_query, classify_query_intent
+from utils.cache import SemanticCache, is_greeting_only, get_greeting_response
 
 
 class ChatEngine:
-    """Main chat engine for Boku AI Assistant"""
+    """Main chat engine for Alfred AI Assistant"""
     
     def __init__(self):
         """Initialize the chat engine"""
         self.knowledge_base = KnowledgeBase()
         self.response_generator = ResponseGenerator()
+        self.semantic_cache = SemanticCache()
         self.is_ready = False
     
     def initialize(self):
@@ -32,6 +34,16 @@ class ChatEngine:
         """Process a chat message and generate response"""
         if not self.is_ready:
             return "I'm not ready yet. Please wait for initialization to complete."
+        
+        # Check for greeting only
+        if is_greeting_only(message):
+            logger.info("🎯 Greeting detected - returning instant response")
+            return get_greeting_response()
+        
+        # Check semantic cache
+        cached_response = self.semantic_cache.get_cached_response(message)
+        if cached_response:
+            return cached_response
         
         # Expand query for better search results
         expanded_query = expand_query(message)
@@ -50,24 +62,20 @@ class ChatEngine:
         # Generate response using LLM
         try:
             response = self.response_generator.generate_response(message, contexts)
+            
+            # Add to dynamic cache for future use
+            self.semantic_cache.add_to_dynamic_cache(message, response)
+            
             return response
         except Exception as e:
             logger.error(f"Response generation failed: {e}")
             return self._get_fallback_response(contexts)
     
     def _get_fallback_response(self, contexts):
-        """Get fallback response when LLM generation fails"""
+        """Generate a fallback response when LLM fails"""
         if contexts:
-            best_context = contexts[0]
-            # Simple first person to third person conversion
-            converted = best_context.replace("I am ", "Surya is ")
-            converted = converted.replace("I have ", "He has ")
-            converted = converted.replace("I work ", "He works ")
-            converted = converted.replace("My ", "Surya's ")
-            converted = converted.replace("I'm ", "He's ")
-            return converted
-        else:
-            return "I'm having trouble generating a response right now."
+            return f"Based on the available information: {contexts[0][:200]}..."
+        return "I encountered an error processing your request. Please try again."
     
     def get_status(self):
         """Get chat engine status"""

@@ -13,14 +13,19 @@ def get_portfolio_data():
     return [
         {
             "id": "personal_info_contact",
-            "text": "Surya Gouthu is a Full Stack Developer based in Los Angeles, California. He can be reached at +1 (407) 663-4191 or via email at pavan.tanai117@gmail.com. He is available for new opportunities, collaborations, and interesting projects.",
+            "text": "Surya Gouthu is a Full Stack Developer based in Los Angeles, California. He can be reached at +1 (407) 663-4191 or via email at pavan.tanai117@gmail.com. He is available for new opportunities, collaborations, and interesting projects. You can find his professional profiles on LinkedIn at linkedin.com/in/surya-gouthu-82b090353, GitHub at github.com/janakiSurya, and his research publication on CSU ScholarWorks at scholarworks.calstate.edu/downloads/n8710030s.",
             "metadata": {
                 "category": "contact",
                 "document_type": "resume",
                 "date": "2024-10",
                 "recency": "current",
-                "keywords": ["surya", "gouthu", "developer", "los angeles", "california", "contact", "email", "phone"],
-                "priority": "high"
+                "keywords": ["surya", "gouthu", "developer", "los angeles", "california", "contact", "email", "phone", "linkedin", "github", "scholarworks", "links", "profile"],
+                "priority": "high",
+                "links": {
+                    "linkedin": "https://www.linkedin.com/in/surya-gouthu-82b090353/",
+                    "github": "https://github.com/janakiSurya",
+                    "scholarworks": "https://scholarworks.calstate.edu/downloads/n8710030s"
+                }
             }
         },
         {
