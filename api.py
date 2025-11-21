@@ -65,7 +65,7 @@ async def root():
     return {"status": "online", "service": "Alfred AI Assistant"}
 
 @app.post("/chat", response_model=ChatResponse)
-@limiter.limit("5/hour")
+@limiter.limit("10/hour")
 async def chat(request: Request, chat_request: ChatRequest):
     """
     Process a chat message and return the response
