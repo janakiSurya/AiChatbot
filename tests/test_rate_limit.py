@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from api import app
 
 def test_rate_limit():
-    print("🚀 Testing Rate Limiting (5 requests/hour)...")
+    print("🚀 Testing Rate Limiting (10 requests/hour)...")
     
     # Use a mock client IP for testing
     client = TestClient(app)
@@ -20,7 +20,7 @@ def test_rate_limit():
     success_count = 0
     blocked_count = 0
     
-    for i in range(1, 8):
+    for i in range(1, 13):
         print(f"\n📝 Request {i}...")
         
         try:
@@ -48,7 +48,7 @@ def test_rate_limit():
     print(f"Successful requests: {success_count}")
     print(f"Blocked requests: {blocked_count}")
     
-    if success_count == 5 and blocked_count >= 1:
+    if success_count == 10 and blocked_count >= 1:
         print("✅ Rate limiting is WORKING!")
     else:
         print("❌ Rate limiting FAILED verification.")
