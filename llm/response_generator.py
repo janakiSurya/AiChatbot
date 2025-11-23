@@ -185,8 +185,91 @@ Answer:"""
         
         return messages
     
+    def generate_response_stream(self, query, context=None, num_contexts=5, history=None):
+        """Generate streaming response using Perplexity AI API"""
+        # Handle greetings
+        if self._is_greeting(query):
+            logger.info("👋 Detected greeting - using creative response")
+            yield self._get_creative_greeting()
+            return
+        
+        # Retrieve context from vector store if not provided
+        if context is None and self.vector_store is not None:
+            logger.info(f"🔍 Retrieving top {num_contexts} contexts from vector store...")
+            context = self.vector_store.search(query, top_k=num_contexts)
+            logger.info(f"✅ Retrieved {len(context)} relevant contexts")
+        
+        # Format context and create messages
+        context_text = self._format_context(context, num_contexts)
+        messages = self._create_messages(query, context_text, history)
+        
+        # Generate streaming response
+        yield from self._generate_with_retry_stream(messages, query, context)
+
+    def _generate_with_retry_stream(self, messages, query, context):
+        """Generate streaming response with retry logic"""
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"🔄 Generating streaming response (attempt {attempt + 1}/{max_retries})...")
+                
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json"
+                }
+                
+                payload = {
+                    "model": self.model,
+                    "messages": messages,
+                    "max_tokens": MAX_RESPONSE_TOKENS,
+                    "temperature": TEMPERATURE,
+                    "stream": True  # Enable streaming
+                }
+                
+                response = requests.post(
+                    self.api_url,
+                    json=payload,
+                    headers=headers,
+                    timeout=30,
+                    stream=True  # Enable streaming in requests
+                )
+                response.raise_for_status()
+                
+                logger.info("✅ API stream connection established")
+                
+                import json
+                
+                for line in response.iter_lines():
+                    if line:
+                        line = line.decode('utf-8')
+                        if line.startswith('data: '):
+                            json_str = line[6:]  # Skip 'data: ' prefix
+                            if json_str.strip() == '[DONE]':
+                                break
+                            try:
+                                data = json.loads(json_str)
+                                if "choices" in data and len(data["choices"]) > 0:
+                                    delta = data["choices"][0]["delta"]
+                                    if "content" in delta:
+                                        yield delta["content"]
+                            except json.JSONDecodeError:
+                                continue
+                return
+
+            except Exception as e:
+                logger.error(f"❌ Stream Error (attempt {attempt + 1}/{max_retries}): {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+        
+        # Fallback if streaming fails
+        yield self._get_smart_fallback(query, context)
+
     def _generate_with_retry(self, messages, query, context):
         """Generate response with retry logic"""
+        # ... (existing implementation) ...
         max_retries = 3
         retry_delay = 2
         

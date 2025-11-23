@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
+import asyncio
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -11,6 +13,9 @@ import os
 
 # Initialize Limiter
 limiter = Limiter(key_func=get_remote_address)
+
+# Rate limit configuration (can be overridden via environment variable)
+RATE_LIMIT = os.getenv("RATE_LIMIT", "10/hour")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -64,21 +69,25 @@ async def root():
     """Health check endpoint"""
     return {"status": "online", "service": "Alfred AI Assistant"}
 
-@app.post("/chat", response_model=ChatResponse)
-@limiter.limit("10/hour")
+@app.post("/chat")
+@limiter.limit(RATE_LIMIT)
 async def chat(request: Request, chat_request: ChatRequest):
     """
-    Process a chat message and return the response
+    Process a chat message and stream the response back to the client.
+    The client receives chunks as they are generated, reducing perceived latency.
     """
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-    
-    try:
-        response = chat_engine.chat(chat_request.message)
-        return {"response": response}
-    except Exception as e:
-        logger.error(f"Error processing chat: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+
+    async def response_generator():
+        # Stream tokens directly from the chat engine
+        for chunk in chat_engine.chat_stream(chat_request.message):
+            yield chunk
+            # Allow event loop to process other tasks
+            await asyncio.sleep(0)
+
+    return StreamingResponse(response_generator(), media_type="text/plain")
+
 
 if __name__ == "__main__":
     import uvicorn

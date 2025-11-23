@@ -80,6 +80,64 @@ class ChatEngine:
         except Exception as e:
             logger.error(f"Response generation failed: {e}")
             return self._get_fallback_response(contexts)
+    def chat_stream(self, message):
+        """Process a chat message and stream response"""
+        if not self.is_ready:
+            yield "I'm not ready yet. Please wait for initialization to complete."
+            return
+        
+        # Check for greeting only
+        if is_greeting_only(message):
+            logger.info("🎯 Greeting detected - returning instant response")
+            yield get_greeting_response()
+            return
+        
+        # Check semantic cache
+        cached_response = self.semantic_cache.get_cached_response(message)
+        if cached_response:
+            # Stream cached response in chunks to simulate typing
+            chunk_size = 20
+            for i in range(0, len(cached_response), chunk_size):
+                yield cached_response[i:i+chunk_size]
+            return
+        
+        # Expand query for better search results using history
+        expanded_query = expand_query(message, self.history)
+        query_intent = classify_query_intent(message)
+        
+        logger.info(f"Original query: {message}")
+        logger.info(f"Expanded query: {expanded_query}")
+        logger.info(f"Query intent: {query_intent}")
+        
+        # Search for relevant contexts
+        contexts = self.knowledge_base.search(expanded_query, k=10)
+        
+        if not contexts:
+            yield "I don't have enough information to answer that question about Surya's portfolio. Please try asking about his skills, experience, projects, education, or contact information."
+            return
+        
+        # Generate streaming response using LLM with history
+        try:
+            full_response = ""
+            for chunk in self.response_generator.generate_response_stream(message, contexts, history=self.history):
+                full_response += chunk
+                yield chunk
+            
+            # Add to dynamic cache for future use
+            if full_response:
+                self.semantic_cache.add_to_dynamic_cache(message, full_response)
+                
+                # Update history
+                self.history.append({"role": "user", "content": message})
+                self.history.append({"role": "assistant", "content": full_response})
+                
+                # Trim history if needed
+                if len(self.history) > self.max_history * 2:
+                    self.history = self.history[-self.max_history * 2:]
+            
+        except Exception as e:
+            logger.error(f"Response generation failed: {e}")
+            yield self._get_fallback_response(contexts)
     
     def _get_fallback_response(self, contexts):
         """Generate a fallback response when LLM fails"""
