@@ -1,12 +1,12 @@
 """
 Knowledge base management for Boku AI Assistant
-Optimized for efficiency
+Optimized with Pinecone cloud storage
 """
 
 import os
 from data.portfolio_data import get_portfolio_data
 from search.hybrid_search import HybridSearch
-from config import FAISS_INDEX_PATH, FAISS_DATA_PATH, logger
+from config import logger
 
 
 class KnowledgeBase:
@@ -18,23 +18,17 @@ class KnowledgeBase:
         self.is_initialized = False
     
     def initialize(self):
-        """Initialize the knowledge base"""
+        """Initialize the knowledge base with Pinecone"""
         try:
-            # Check if index files exist
-            if os.path.exists(FAISS_INDEX_PATH) and os.path.exists(FAISS_DATA_PATH):
-                # Load existing index
-                self.search_engine.initialize(
-                    faiss_index_path=FAISS_INDEX_PATH,
-                    data_path=FAISS_DATA_PATH
-                )
-                logger.info("✅ Loaded existing knowledge base")
-            else:
-                # Create new index from portfolio data
-                portfolio_data = get_portfolio_data()
-                self.search_engine.initialize(portfolio_data=portfolio_data)
-                self.search_engine.save_index(FAISS_INDEX_PATH, FAISS_DATA_PATH)
-                logger.info("✅ Created new knowledge base")
+            # Get portfolio data (will be indexed if Pinecone is empty)
+            portfolio_data = get_portfolio_data()
             
+            # Initialize search engine with Pinecone
+            # Pinecone handles persistence, so we just pass the data
+            # It will only index if the Pinecone index is empty
+            self.search_engine.initialize(portfolio_data=portfolio_data)
+            
+            logger.info("✅ Knowledge base initialized with Pinecone")
             self.is_initialized = True
             return True
             
@@ -54,8 +48,11 @@ class KnowledgeBase:
         if not self.is_initialized:
             return {"status": "not_initialized"}
         
+        # Get Pinecone stats
+        stats = self.search_engine.vector_search.get_stats()
+        
         return {
             "status": "initialized",
-            "documents_count": len(self.search_engine.vector_search.documents_data),
-            "index_type": type(self.search_engine.vector_search.faiss_index).__name__
+            "vector_count": stats.get('total_vector_count', 0),
+            "index_name": stats.get('index_fullness', 'N/A')
         }

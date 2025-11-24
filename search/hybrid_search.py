@@ -1,9 +1,9 @@
 """
 Hybrid search combining vector and keyword search
-Optimized for efficiency
+Optimized for efficiency with Pinecone cloud storage
 """
 
-from search.vector_search import VectorSearch
+from search.pinecone_search import PineconeSearch
 from search.keyword_search import KeywordSearch
 
 
@@ -12,41 +12,51 @@ class HybridSearch:
     
     def __init__(self):
         """Initialize hybrid search system"""
-        self.vector_search = VectorSearch()
+        self.vector_search = PineconeSearch()
         self.keyword_search = None
+        self.documents_data = []
+        self.metadatas_data = []
     
-    def initialize(self, portfolio_data=None, faiss_index_path=None, data_path=None):
-        """Initialize the search system"""
+    def initialize(self, portfolio_data=None):
+        """
+        Initialize the search system with Pinecone
+        
+        Args:
+            portfolio_data: Optional list of documents to index (only if Pinecone is empty)
+        """
+        # Initialize Pinecone (will create/connect to index)
+        if not self.vector_search.initialize(portfolio_data=portfolio_data):
+            raise ValueError("Failed to initialize Pinecone")
+        
+        # For keyword search, we need to get documents from Pinecone or use provided data
         if portfolio_data:
-            # Create new index from portfolio data
-            self.vector_search.create_index(portfolio_data)
-            self.keyword_search = KeywordSearch(
-                self.vector_search.documents_data,
-                self.vector_search.metadatas_data
-            )
-        elif faiss_index_path and data_path:
-            # Load existing index
-            if self.vector_search.load_index(faiss_index_path, data_path):
-                self.keyword_search = KeywordSearch(
-                    self.vector_search.documents_data,
-                    self.vector_search.metadatas_data
-                )
-            else:
-                raise ValueError("Failed to load existing index")
+            self.documents_data = [item["text"] for item in portfolio_data]
+            self.metadatas_data = [item["metadata"] for item in portfolio_data]
         else:
-            raise ValueError("Either portfolio_data or index paths must be provided")
-    
-    def save_index(self, faiss_index_path, data_path):
-        """Save the search index"""
-        self.vector_search.save_index(faiss_index_path, data_path)
+            # If no portfolio data provided, we'll use empty lists for now
+            # In a production system, you might want to fetch from Pinecone metadata
+            self.documents_data = []
+            self.metadatas_data = []
+        
+        # Initialize keyword search
+        if self.documents_data:
+            self.keyword_search = KeywordSearch(
+                self.documents_data,
+                self.metadatas_data
+            )
+        else:
+            # Create empty keyword search (will only use vector search)
+            self.keyword_search = KeywordSearch([], [])
     
     def search(self, query, k=10):
         """Perform hybrid search combining vector and keyword search"""
-        # Get vector search results
+        # Get vector search results from Pinecone
         vector_results = self.vector_search.search(query, k)
         
-        # Get keyword search results
-        keyword_results = self.keyword_search.search(query, k)
+        # Get keyword search results (if available)
+        keyword_results = []
+        if self.keyword_search and self.documents_data:
+            keyword_results = self.keyword_search.search(query, k)
         
         # Combine and deduplicate
         combined = []

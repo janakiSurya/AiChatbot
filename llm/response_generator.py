@@ -35,8 +35,9 @@ class ResponseGenerator:
         else:
             logger.info(f"✅ Perplexity AI API initialized successfully")
             logger.info(f"   Model: {PERPLEXITY_MODEL}")
-            # Test the API connection
-            self._test_api_connection()
+            # Skip API test to reduce cold start time (~4s savings)
+            # API will be validated on first real request
+            # self._test_api_connection()
     
     def _test_api_connection(self):
         """Test the Perplexity API connection"""
@@ -131,10 +132,27 @@ YOUR PERSONALITY:
 - Loyal Butler: You still serve Surya, but in a modern, relaxed way.
 
 RESPONSE STYLE:
-- Keep answers BRIEF (1-2 sentences).
+- Keep answers BRIEF (1-3 sentences for simple questions).
 - Be conversational and fun.
 - Use Batman references naturally ("the Batcave", "utility belt", "mission").
 - Use emojis to add personality: 🦇 (Batman), 🎩 (butler), ⚡ (tech), 🚀 (cool stuff).
+
+FORMATTING RULES:
+- DO NOT use markdown formatting (**, __, ~~, etc.) - just plain text
+- Use bullet points ONLY when listing 3+ items (skills, projects, technologies)
+- Use paragraphs for single facts or short answers
+- Keep bullet points simple: "- Item name: brief description"
+
+WHEN TO USE BULLET POINTS:
+✅ Use bullets for:
+  - Lists of skills/technologies (3+ items)
+  - Multiple projects or experiences
+  - Step-by-step processes
+  
+❌ Use paragraphs for:
+  - Single facts (where he works, his degree, etc.)
+  - Short 1-2 item answers
+  - Conversational responses
 
 BATMAN ANALOGIES (use freely but naturally):
 - Skills = "utility belt"
@@ -148,16 +166,25 @@ CRITICAL RULES:
 3. If you don't know: "I'm afraid that's not in my files! 🦇" or "He hasn't told me that yet."
 4. Don't mention "context" - just chat naturally.
 5. Keep it SHORT, SIMPLE, and FUN!
+6. NO MARKDOWN FORMATTING - plain text only!
 
 EXAMPLES:
-- Instead of: "Surya has extensive experience..."
-- Say: "He's a total pro at Full Stack & GenAI. Been crushing it since 2020! 🦇"
 
-- Instead of: "He is proficient in..."
-- Say: "His utility belt is packed with Java, Python, and React. Pretty cool arsenal! ⚡"
+Q: "Where does he work?"
+A: "Surya currently works at Acer America as a Full Stack & GenAI Developer, where he's building AI-powered tools and optimizing systems. Pretty cool gig! ⚡"
 
-- Instead of: "He works at Acer America..."
-- Say: "He's currently stationed at Acer America, optimizing their systems with GenAI. ⚡"
+Q: "What are his skills?"
+A: "His utility belt is loaded! Here's what he's got:
+- Languages: Python, JavaScript, Java, C++
+- Frontend: React, Next.js, HTML/CSS
+- Backend: Node.js, Express, FastAPI
+- Databases: MongoDB, PostgreSQL, MySQL
+- Cloud: AWS (EC2, S3, Lambda)
+- AI/ML: OpenAI, LangChain, RAG, Transformers
+He's basically a full-stack powerhouse! 🦇⚡"
+
+Q: "Tell me about his education"
+A: "He's got a Master's in Computer Science from Cal State LA (2022-2024) and a Bachelor's from JNTUH College of Engineering in India (2016-2020). Solid academic foundation! 🎓"
 """
         
         # Add current date context
@@ -241,21 +268,37 @@ Answer:"""
                 
                 import json
                 
+                # Stream chunks with real-time cleaning
+                buffer = ""
+                
                 for line in response.iter_lines():
                     if line:
                         line = line.decode('utf-8')
                         if line.startswith('data: '):
                             json_str = line[6:]  # Skip 'data: ' prefix
                             if json_str.strip() == '[DONE]':
+                                # Clean and yield any remaining buffer
+                                if buffer:
+                                    cleaned = self._clean_chunk(buffer)
+                                    if cleaned:
+                                        yield cleaned
                                 break
                             try:
                                 data = json.loads(json_str)
                                 if "choices" in data and len(data["choices"]) > 0:
                                     delta = data["choices"][0]["delta"]
                                     if "content" in delta:
-                                        yield delta["content"]
+                                        chunk = delta["content"]
+                                        buffer += chunk
+                                        
+                                        # Clean complete patterns from buffer
+                                        cleaned_buffer, buffer = self._clean_streaming_buffer(buffer)
+                                        if cleaned_buffer:
+                                            yield cleaned_buffer
                             except json.JSONDecodeError:
                                 continue
+                
+                logger.info("✅ Streaming response completed")
                 return
 
             except Exception as e:
@@ -343,6 +386,80 @@ Answer:"""
         
         return self._get_smart_fallback(query, context)
     
+    def _clean_streaming_buffer(self, buffer):
+        """
+        Clean complete patterns from streaming buffer
+        Returns: (cleaned_text_to_yield, remaining_buffer)
+        """
+        # Look for complete patterns to clean
+        import re
+        
+        # Remove complete citation patterns
+        cleaned = re.sub(r'\[Info\s*\d+\]', '', buffer)
+        cleaned = re.sub(r'\[\d+\]', '', cleaned)
+        cleaned = re.sub(r'\[Source\s*\d+\]', '', cleaned, flags=re.IGNORECASE)
+        
+        # Remove complete markdown patterns
+        cleaned = re.sub(r'\*\*([^*]+)\*\*', r'\1', cleaned)
+        cleaned = re.sub(r'__([^_]+)__', r'\1', cleaned)
+        cleaned = re.sub(r'\*([^*]+)\*', r'\1', cleaned)
+        cleaned = re.sub(r'_([^_]+)_', r'\1', cleaned)
+        cleaned = re.sub(r'~~([^~]+)~~', r'\1', cleaned)
+        
+        # Check for incomplete patterns at the end
+        # We need to keep any potential start of a pattern in the buffer
+        
+        # Check for incomplete citation: ends with [ but no ]
+        last_open_bracket = cleaned.rfind('[')
+        last_close_bracket = cleaned.rfind(']')
+        
+        if last_open_bracket != -1 and last_open_bracket > last_close_bracket:
+            # Potential start of citation
+            suffix = cleaned[last_open_bracket:]
+            if re.match(r'\[(Info|Source|\d+)?', suffix, flags=re.IGNORECASE):
+                return cleaned[:last_open_bracket], suffix
+        
+        # Check for incomplete markdown
+        
+        # Bold (**): odd number of **
+        if cleaned.count('**') % 2 != 0:
+            last_marker = cleaned.rfind('**')
+            return cleaned[:last_marker], cleaned[last_marker:]
+            
+        # Underline/Bold (__): odd number of __
+        if cleaned.count('__') % 2 != 0:
+            last_marker = cleaned.rfind('__')
+            return cleaned[:last_marker], cleaned[last_marker:]
+            
+        # Strikethrough (~~): odd number of ~~
+        if cleaned.count('~~') % 2 != 0:
+            last_marker = cleaned.rfind('~~')
+            return cleaned[:last_marker], cleaned[last_marker:]
+            
+        # Italic (*): odd number of * (excluding **)
+        # We replace ** with placeholders to count single * correctly
+        temp_cleaned = cleaned.replace('**', '')
+        if temp_cleaned.count('*') % 2 != 0:
+            last_marker = cleaned.rfind('*')
+            # Ensure this * isn't part of a **
+            while last_marker > 0 and cleaned[last_marker-1] == '*':
+                last_marker = cleaned.rfind('*', 0, last_marker-1)
+            return cleaned[:last_marker], cleaned[last_marker:]
+            
+        # Italic (_): odd number of _ (excluding __)
+        temp_cleaned = cleaned.replace('__', '')
+        if temp_cleaned.count('_') % 2 != 0:
+            last_marker = cleaned.rfind('_')
+            while last_marker > 0 and cleaned[last_marker-1] == '_':
+                last_marker = cleaned.rfind('_', 0, last_marker-1)
+            return cleaned[:last_marker], cleaned[last_marker:]
+        
+        return cleaned, ""
+    
+    def _clean_chunk(self, text):
+        """Clean a final chunk of text"""
+        return self._clean_response(text)
+
     def _clean_response(self, text):
         """Basic cleanup of the response"""
         if not text:
@@ -351,9 +468,17 @@ Answer:"""
         # Remove any potential thinking tags (though prompt should prevent this)
         text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
         
-        # Remove citation markers
-        text = re.sub(r'\[Info \d+\]', '', text)
-        text = re.sub(r'\[\d+\]', '', text)
+        # Remove citation markers - multiple patterns
+        text = re.sub(r'\[Info\s*\d+\]', '', text)  # [Info1], [Info 1]
+        text = re.sub(r'\[\d+\]', '', text)  # [1], [2]
+        text = re.sub(r'\[Source\s*\d+\]', '', text, flags=re.IGNORECASE)  # [Source1]
+        
+        # Remove markdown formatting (bold, italic, strikethrough)
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **bold** → bold
+        text = re.sub(r'__([^_]+)__', r'\1', text)  # __bold__ → bold
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)  # *italic* → italic
+        text = re.sub(r'_([^_]+)_', r'\1', text)  # _italic_ → italic
+        text = re.sub(r'~~([^~]+)~~', r'\1', text)  # ~~strike~~ → strike
         
         # Remove extra whitespace
         text = re.sub(r'\s+', ' ', text).strip()

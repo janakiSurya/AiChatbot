@@ -5,9 +5,15 @@ Orchestrates the conversation flow with caching and greeting detection
 
 from core.knowledge_base import KnowledgeBase
 from llm.response_generator import ResponseGenerator
-from config import logger
+from config import logger, USE_REDIS_CACHE
 from utils.query_expander import expand_query, classify_query_intent
-from utils.cache import SemanticCache, is_greeting_only, get_greeting_response
+
+# Import appropriate cache based on configuration
+if USE_REDIS_CACHE:
+    from utils.redis_cache import RedisSemanticCache as CacheClass
+    from utils.cache import is_greeting_only, get_greeting_response
+else:
+    from utils.cache import SemanticCache as CacheClass, is_greeting_only, get_greeting_response
 
 
 class ChatEngine:
@@ -17,7 +23,7 @@ class ChatEngine:
         """Initialize the chat engine"""
         self.knowledge_base = KnowledgeBase()
         self.response_generator = ResponseGenerator()
-        self.semantic_cache = SemanticCache()
+        self.semantic_cache = CacheClass()
         self.history = []  # Store conversation history
         self.max_history = 5  # Keep last 5 turns
         self.is_ready = False
@@ -65,8 +71,8 @@ class ChatEngine:
         try:
             response = self.response_generator.generate_response(message, contexts, history=self.history)
             
-            # Add to dynamic cache for future use
-            self.semantic_cache.add_to_dynamic_cache(message, response)
+            # Add to cache for future use
+            self.semantic_cache.add_to_cache(message, response)
             
             # Update history
             self.history.append({"role": "user", "content": message})
@@ -123,9 +129,9 @@ class ChatEngine:
                 full_response += chunk
                 yield chunk
             
-            # Add to dynamic cache for future use
+            # Add to cache for future use
             if full_response:
-                self.semantic_cache.add_to_dynamic_cache(message, full_response)
+                self.semantic_cache.add_to_cache(message, full_response)
                 
                 # Update history
                 self.history.append({"role": "user", "content": message})

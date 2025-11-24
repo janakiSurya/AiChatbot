@@ -69,6 +69,48 @@ async def root():
     """Health check endpoint"""
     return {"status": "online", "service": "Alfred AI Assistant"}
 
+
+@app.get("/health")
+async def health_check():
+    """
+    Lightweight health check endpoint for monitoring services
+    Use this for cron jobs to prevent cold starts without heavy operations
+    """
+    from datetime import datetime
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "service": "Alfred AI Assistant"
+    }
+
+
+@app.get("/stats")
+async def get_stats():
+    """Get server statistics for monitoring"""
+    try:
+        import psutil
+        import time
+        
+        process = psutil.Process()
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        
+        # Get cache stats if available
+        cache_stats = {}
+        if chat_engine.is_ready:
+            cache_stats = chat_engine.semantic_cache.get_stats()
+        
+        return {
+            "memory_mb": round(memory_mb, 2),
+            "cpu_percent": process.cpu_percent(),
+            "cache_stats": cache_stats,
+            "engine_ready": chat_engine.is_ready
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "engine_ready": chat_engine.is_ready
+        }
+
 @app.post("/chat")
 @limiter.limit(RATE_LIMIT)
 async def chat(request: Request, chat_request: ChatRequest):

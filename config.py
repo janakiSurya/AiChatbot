@@ -37,7 +37,7 @@ logger = setup_logger()
 
 def validate_config():
     """Validate that all required configuration is present"""
-    required_vars = ["PERPLEXITY_API_KEY"]
+    required_vars = ["PERPLEXITY_API_KEY", "PINECONE_API_KEY"]
     missing = [var for var in required_vars if not os.getenv(var)]
     
     if missing:
@@ -47,8 +47,17 @@ def validate_config():
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FAISS_INDEX_PATH = os.path.join(BASE_DIR, "faiss_index.bin")
-FAISS_DATA_PATH = os.path.join(BASE_DIR, "faiss_data.pkl")
+
+# Pinecone Configuration
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "us-east-1")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "portfolio-assistant")
+PINECONE_DIMENSION = 384  # Dimension for all-MiniLM-L6-v2 embeddings
+
+# Upstash Redis Configuration (for persistent cache)
+UPSTASH_REDIS_URL = os.getenv("UPSTASH_REDIS_URL")
+UPSTASH_REDIS_TOKEN = os.getenv("UPSTASH_REDIS_TOKEN")
+USE_REDIS_CACHE = bool(UPSTASH_REDIS_URL and UPSTASH_REDIS_TOKEN)
 
 # Models
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
