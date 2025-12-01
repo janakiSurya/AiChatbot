@@ -138,13 +138,13 @@ def get_portfolio_data():
         },
         {
             "id": "experience_acer_overview",
-            "text": "Surya currently works at Acer America, USA as a Full Stack & GenAI Developer since July 2024. He focuses on integrating Generative AI capabilities into enterprise applications and building scalable AI-powered solutions.",
+            "text": "Surya currently works at Acer America, USA as a Full Stack & GenAI Developer. He started this role in July 2024 and has been working there since then. He focuses on integrating Generative AI capabilities into enterprise applications and building scalable AI-powered solutions.",
             "metadata": {
                 "category": "experience",
                 "document_type": "resume",
                 "date": "2024-07",
                 "recency": "current",
-                "keywords": ["acer", "america", "full stack", "genai", "developer", "current", "2024"],
+                "keywords": ["acer", "america", "full stack", "genai", "developer", "current", "2024", "duration", "time", "period", "since", "start date", "how long"],
                 "priority": "high",
                 "company": "Acer America",
                 "role": "Full Stack & GenAI Developer",

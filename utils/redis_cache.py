@@ -6,13 +6,12 @@ Provides persistent caching across server restarts with semantic similarity matc
 import json
 import hashlib
 from typing import Optional
-from sentence_transformers import SentenceTransformer
+from utils.embedding_manager import embedding_manager
 import numpy as np
 from config import (
     UPSTASH_REDIS_URL,
     UPSTASH_REDIS_TOKEN,
     USE_REDIS_CACHE,
-    EMBEDDING_MODEL,
     logger
 )
 
@@ -20,19 +19,17 @@ from config import (
 class RedisSemanticCache:
     """Semantic cache backed by Upstash Redis for persistence"""
     
-    def __init__(self, similarity_threshold=0.85, ttl_days=30, lazy_load=True):
+    def __init__(self, similarity_threshold=0.85, ttl_days=30):
         """
-        Initialize Redis semantic cache
+        Initialize Redis semantic cache.
+        Uses shared embedding manager instead of loading separate model.
         
         Args:
             similarity_threshold: Minimum similarity score for cache hit
             ttl_days: Time-to-live for cache entries in days
-            lazy_load: If True, defer embedding model loading until first use
         """
         self.similarity_threshold = similarity_threshold
         self.ttl_seconds = ttl_days * 24 * 60 * 60
-        self._embedding_model = None
-        self.lazy_load = lazy_load
         self.redis = None
         self.is_connected = False
         
@@ -54,28 +51,13 @@ class RedisSemanticCache:
         # Fallback in-memory cache
         self.memory_cache = {}
     
-    def _load_embedding_model(self):
-        """Load the embedding model (lazy-loaded on first use)"""
-        if self._embedding_model is None:
-            logger.info("📦 Loading embedding model for cache...")
-            from sentence_transformers import SentenceTransformer
-            self._embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-            logger.info("✅ Embedding model loaded")
-    
-    @property
-    def embedding_model(self):
-        """Lazy-load embedding model on first access"""
-        if self._embedding_model is None:
-            self._load_embedding_model()
-        return self._embedding_model
+    def _get_embedding(self, text: str) -> np.ndarray:
+        """Generate embedding for text using shared model"""
+        return embedding_manager.encode([text])[0]
     
     def _generate_cache_key(self, query: str) -> str:
         """Generate a unique cache key for a query"""
         return f"cache:{hashlib.md5(query.encode()).hexdigest()}"
-    
-    def _get_embedding(self, text: str) -> np.ndarray:
-        """Generate embedding for text"""
-        return self.embedding_model.encode([text])[0]
     
     def _cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
         """Calculate cosine similarity between two vectors"""

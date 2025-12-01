@@ -4,13 +4,12 @@ Cloud-hosted vector database for persistent storage across deployments
 """
 
 from pinecone import Pinecone, ServerlessSpec
-from sentence_transformers import SentenceTransformer
+from utils.embedding_manager import embedding_manager
 from config import (
     PINECONE_API_KEY,
     PINECONE_ENVIRONMENT,
     PINECONE_INDEX_NAME,
     PINECONE_DIMENSION,
-    EMBEDDING_MODEL,
     MAX_TOKENS,
     logger
 )
@@ -20,37 +19,19 @@ import time
 class PineconeSearch:
     """Handles vector-based search using Pinecone cloud database"""
     
-    def __init__(self, lazy_load=True):
+    def __init__(self):
         """
-        Initialize the Pinecone search system
-        
-        Args:
-            lazy_load: If True, defer embedding model loading until first use
+        Initialize the Pinecone search system.
+        Uses shared embedding manager instead of loading separate model.
         """
-        self._embedding_model = None
-        self.lazy_load = lazy_load
         self.pc = None
         self.index = None
         self.is_initialized = False
-        
-        # Load embedding model immediately if not lazy loading
-        if not lazy_load:
-            self._load_embedding_model()
-    
-    def _load_embedding_model(self):
-        """Load the embedding model (lazy-loaded on first use)"""
-        if self._embedding_model is None:
-            logger.info("📦 Loading embedding model...")
-            from sentence_transformers import SentenceTransformer
-            self._embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-            logger.info("✅ Embedding model loaded")
     
     @property
     def embedding_model(self):
-        """Lazy-load embedding model on first access"""
-        if self._embedding_model is None:
-            self._load_embedding_model()
-        return self._embedding_model
+        """Get shared embedding model from singleton manager"""
+        return embedding_manager.get_model()
     
     def initialize(self, portfolio_data=None):
         """

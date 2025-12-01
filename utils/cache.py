@@ -5,7 +5,7 @@ Includes both static pre-defined cache and dynamic LRU cache
 """
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from utils.embedding_manager import embedding_manager
 from typing import Optional, List, Dict, Tuple
 from collections import OrderedDict
 import random
@@ -16,8 +16,10 @@ class SemanticCache:
     """Cache responses using semantic similarity with hybrid static + dynamic caching"""
     
     def __init__(self, similarity_threshold=0.85, max_dynamic_cache=50):
-        """Initialize semantic cache with embedding model"""
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        """
+        Initialize semantic cache with shared embedding model.
+        Uses singleton embedding manager instead of loading separate model.
+        """
         self.similarity_threshold = similarity_threshold
         self.max_dynamic_cache = max_dynamic_cache
         
@@ -101,10 +103,10 @@ class SemanticCache:
             }
         }
         
-        # Pre-compute embeddings for all cached queries
+        # Pre-compute embeddings for all cached queries using shared model
         cache = {}
         for category, data in cache_data.items():
-            embeddings = self.model.encode(data["queries"])
+            embeddings = embedding_manager.encode(data["queries"])
             cache[category] = {
                 "embeddings": embeddings,
                 "responses": data["responses"],
@@ -124,7 +126,7 @@ class SemanticCache:
         Returns:
             Cached response if found, None otherwise
         """
-        query_embedding = self.model.encode([query])[0]
+        query_embedding = embedding_manager.encode([query])[0]
         
         # First, check static cache (pre-defined common questions)
         for category, data in self.static_cache.items():
@@ -187,7 +189,7 @@ class SemanticCache:
             logger.info("⚠️ Not caching: response contains error/apology")
             return
         
-        query_embedding = self.model.encode([query])[0]
+        query_embedding = embedding_manager.encode([query])[0]
         
         # Check if similar query already exists
         for cached_query, (cached_embedding, _, _) in self.dynamic_cache.items():

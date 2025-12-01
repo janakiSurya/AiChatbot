@@ -68,7 +68,10 @@ def expand_query(query, history=None):
         'job': ['job', 'role', 'position', 'work', 'employment', 'career'],
         'skill': ['skill', 'expertise', 'technology', 'knowledge', 'ability', 'proficiency'],
         'experience': ['experience', 'background', 'history', 'career', 'work history'],
-        'education': ['education', 'degree', 'study', 'academic', 'university', 'college']
+        'education': ['education', 'degree', 'study', 'academic', 'university', 'college'],
+        'how long': ['duration', 'period', 'time', 'years', 'months', 'since'],
+        'when': ['date', 'year', 'time', 'start', 'join'],
+        'start': ['join', 'begin', 'commence', 'date']
     }
     
     # Find matching expansions
@@ -82,6 +85,7 @@ def expand_query(query, history=None):
         expanded_terms.extend(['company', 'employer', 'organization'])
     
     # If no specific expansion found, add common related terms
+    # But ONLY if we haven't already found time-related expansions (which are specific)
     if not expanded_terms:
         if 'work' in query_lower:
             expanded_terms.extend(['project', 'achievement', 'accomplishment'])
@@ -90,7 +94,9 @@ def expand_query(query, history=None):
     
     # Combine original query with expansions
     if expanded_terms:
-        expanded_query = query + " " + " ".join(expanded_terms[:3])  # Limit to 3 expansions
+        # Deduplicate terms
+        unique_terms = list(dict.fromkeys(expanded_terms))
+        expanded_query = query + " " + " ".join(unique_terms[:4])  # Limit to 4 expansions
         return expanded_query
     
     return query

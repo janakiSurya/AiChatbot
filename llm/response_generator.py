@@ -22,7 +22,7 @@ class ResponseGenerator:
     """Handles response generation using Perplexity AI API"""
     
     def __init__(self, vector_store=None):
-        """Initialize the response generator with Perplexity AI API"""
+        """Initialize the response generator with Perplexity AI API and connection pooling"""
         logger.info("🔄 Initializing Perplexity AI API...")
         
         self.api_key = PERPLEXITY_API_KEY
@@ -30,24 +30,33 @@ class ResponseGenerator:
         self.api_url = "https://api.perplexity.ai/chat/completions"
         self.vector_store = vector_store
         
+        # HTTP Session for connection pooling (reuse connections)
+        self.session = requests.Session()
+        self.session.headers.update({
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        })
+        
         if not self.api_key:
             logger.warning("⚠️  PERPLEXITY_API_KEY not found in environment variables")
         else:
-            logger.info(f"✅ Perplexity AI API initialized successfully")
+            logger.info(f"✅ Perplexity AI API initialized with connection pooling")
             logger.info(f"   Model: {PERPLEXITY_MODEL}")
             # Skip API test to reduce cold start time (~4s savings)
             # API will be validated on first real request
             # self._test_api_connection()
     
+    def cleanup(self):
+        """Close HTTP session and release resources"""
+        if self.session:
+            logger.info("🗑️  Closing HTTP session...")
+            self.session.close()
+            logger.info("✅ HTTP session closed")
+    
     def _test_api_connection(self):
         """Test the Perplexity API connection"""
         try:
             logger.info("🔍 Testing Perplexity API connection...")
-            
-            headers = {
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
-            }
             
             payload = {
                 "model": self.model,
@@ -55,7 +64,7 @@ class ResponseGenerator:
                 "max_tokens": 10
             }
             
-            response = requests.post(self.api_url, json=payload, headers=headers, timeout=10)
+            response = self.session.post(self.api_url, json=payload, timeout=10)
             
             if response.status_code == 200:
                 logger.info("✅ API connection successful!")
@@ -167,6 +176,8 @@ CRITICAL RULES:
 4. Don't mention "context" - just chat naturally.
 5. Keep it SHORT, SIMPLE, and FUN!
 6. NO MARKDOWN FORMATTING - plain text only!
+7. When calculating durations (e.g., "how long"), ALWAYS use the CURRENT DATE provided below as the end date.
+8. PRIORITIZE explicit dates in the context (e.g., "since July 2024") over inferred dates.
 
 EXAMPLES:
 
@@ -242,11 +253,6 @@ Answer:"""
             try:
                 logger.info(f"🔄 Generating streaming response (attempt {attempt + 1}/{max_retries})...")
                 
-                headers = {
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                }
-                
                 payload = {
                     "model": self.model,
                     "messages": messages,
@@ -255,10 +261,10 @@ Answer:"""
                     "stream": True  # Enable streaming
                 }
                 
-                response = requests.post(
+                # Use session for connection pooling
+                response = self.session.post(
                     self.api_url,
                     json=payload,
-                    headers=headers,
                     timeout=30,
                     stream=True  # Enable streaming in requests
                 )
@@ -320,11 +326,6 @@ Answer:"""
             try:
                 logger.info(f"🔄 Generating response (attempt {attempt + 1}/{max_retries})...")
                 
-                headers = {
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                }
-                
                 payload = {
                     "model": self.model,
                     "messages": messages,
@@ -332,10 +333,10 @@ Answer:"""
                     "temperature": TEMPERATURE
                 }
                 
-                response = requests.post(
+                # Use session for connection pooling
+                response = self.session.post(
                     self.api_url,
                     json=payload,
-                    headers=headers,
                     timeout=30
                 )
                 response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)

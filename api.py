@@ -64,10 +64,38 @@ async def startup_event():
     else:
         logger.error("❌ Failed to initialize chat engine")
 
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup resources on shutdown"""
+    logger.info("🛑 Shutting down Alfred API...")
+    
+    try:
+        # Close HTTP session
+        if hasattr(chat_engine, 'response_generator') and hasattr(chat_engine.response_generator, 'cleanup'):
+            chat_engine.response_generator.cleanup()
+        
+        # Cleanup embedding manager
+        from utils.embedding_manager import embedding_manager
+        embedding_manager.cleanup()
+        
+        logger.info("✅ Cleanup complete")
+    except Exception as e:
+        logger.error(f"⚠️  Cleanup error: {e}")
+
 @app.get("/")
 async def root():
     """Health check endpoint"""
     return {"status": "online", "service": "Alfred AI Assistant"}
+
+
+@app.get("/ping")
+async def ping():
+    """
+    Ultra-lightweight ping endpoint for keep-alive services
+    Fastest possible response with minimal overhead
+    """
+    return {"status": "ok"}
 
 
 @app.get("/health")
