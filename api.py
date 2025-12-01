@@ -89,11 +89,12 @@ async def root():
     return {"status": "online", "service": "Alfred AI Assistant"}
 
 
-@app.get("/ping")
+@app.api_route("/ping", methods=["GET", "HEAD", "POST"])
 async def ping():
     """
     Ultra-lightweight ping endpoint for keep-alive services
     Fastest possible response with minimal overhead
+    Accepts GET, HEAD, and POST methods for monitoring compatibility
     """
     return {"status": "ok"}
 
