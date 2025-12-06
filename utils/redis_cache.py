@@ -20,7 +20,7 @@ from config import (
 class RedisSemanticCache:
     """Semantic cache backed by Upstash Redis for persistence"""
     
-    def __init__(self, similarity_threshold=0.85, ttl_days=30):
+    def __init__(self, similarity_threshold=0.92, ttl_days=30):
         """
         Initialize Redis semantic cache.
         Uses Pinecone Inference API for embeddings.
@@ -64,6 +64,37 @@ class RedisSemanticCache:
         """Calculate cosine similarity between two vectors"""
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
     
+    def _is_vague_query(self, query: str) -> bool:
+        """
+        Check if query is vague/ambiguous and requires conversation context.
+        These should NOT be cached or matched from cache.
+        """
+        query_lower = query.lower()
+        
+        # Pronouns and references that need context
+        context_words = [
+            'that skill', 'this skill', 'those skills',
+            'that project', 'this project', 'those projects',
+            'that job', 'this job', 'that role',
+            'tell me more', 'more about it', 'more about that',
+            'what about', 'how about', 'and what',
+            'the same', 'like that', 'similar',
+            ' there '
+        ]
+        
+        # Check if query contains context-dependent phrases
+        for phrase in context_words:
+            if phrase in query_lower:
+                logger.info(f"⚠️ Vague query detected: '{phrase}' - skipping cache")
+                return True
+        
+        # Very short queries are often follow-ups
+        if len(query.split()) <= 3:
+            logger.info(f"⚠️ Short query detected - skipping cache")
+            return True
+        
+        return False
+    
     def get_cached_response(self, query: str) -> Optional[str]:
         """
         Check cache for similar query and return response
@@ -74,6 +105,10 @@ class RedisSemanticCache:
         Returns:
             Cached response if found, None otherwise
         """
+        # Skip cache for vague/context-dependent queries
+        if self._is_vague_query(query):
+            return None
+        
         query_embedding = self._get_embedding(query)
         
         # Try Redis first
@@ -151,6 +186,11 @@ class RedisSemanticCache:
             query: User's question
             response: Generated response
         """
+        # Don't cache vague/context-dependent queries
+        if self._is_vague_query(query):
+            logger.info("⚠️  Not caching: query is context-dependent")
+            return
+        
         # Don't cache very short or very long responses
         if len(response) < 50 or len(response) > 1000:
             logger.info(f"⚠️  Not caching: response length {len(response)} outside limits")

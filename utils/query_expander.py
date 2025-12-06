@@ -43,12 +43,21 @@ def expand_query(query, history=None):
                 query = f"{' '.join(entities)} {query}"
                 query_lower = query.lower()
     
-    # Handle pronouns using history
+    # Handle pronouns and contextual references using history
     if history and len(history) >= 2:
-        # Check for pronouns
-        pronouns = [' it ', ' that ', ' he ', ' his ', ' she ', ' her ', ' they ', ' them ', ' there ']
-        if any(p in f" {query_lower} " for p in pronouns):
-            # Get the last user query from history
+        # Check for contextual references that need history
+        context_phrases = [
+            'that skill', 'this skill', 'those skills',
+            'that project', 'this project', 'those projects',
+            'that technology', 'this technology',
+            ' it ', ' that ', ' this ', ' there ',
+            'tell me more', 'more about', 'the same'
+        ]
+        
+        needs_context = any(phrase in f" {query_lower} " for phrase in context_phrases)
+        
+        if needs_context:
+            # Get the last user query and extract key topics
             last_user_query = None
             for msg in reversed(history):
                 if msg['role'] == 'user':
@@ -56,8 +65,35 @@ def expand_query(query, history=None):
                     break
             
             if last_user_query:
-                # Combine last query with current query for context
-                query = f"{last_user_query} {query}"
+                # Extract key entities from the last query
+                key_entities = []
+                
+                # Technology/skill keywords
+                tech_keywords = ['aws', 'react', 'node', 'python', 'mongodb', 'docker', 
+                                'kubernetes', 'ai', 'genai', 'generative ai', 'llm', 
+                                'gpt', 'langchain', 'pinecone', 'cloud']
+                for tech in tech_keywords:
+                    if tech in last_user_query.lower():
+                        key_entities.append(tech)
+                
+                # Company names
+                for company in ['acer', 'mindtree', 'tata']:
+                    if company in last_user_query.lower():
+                        key_entities.append(company)
+                
+                # Topics
+                for topic in ['thesis', 'research', 'certification', 'education', 'hackathon']:
+                    if topic in last_user_query.lower():
+                        key_entities.append(topic)
+                
+                # Combine last query context with current query
+                if key_entities:
+                    context = ' '.join(key_entities)
+                    query = f"{context} {query}"
+                else:
+                    # If no specific entities found, prepend the whole last query
+                    query = f"{last_user_query} {query}"
+                
                 query_lower = query.lower()
     
     # Query expansion mappings
