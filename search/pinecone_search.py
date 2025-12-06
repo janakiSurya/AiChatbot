@@ -1,6 +1,7 @@
 """
 Pinecone-based vector search
 Cloud-hosted vector database for persistent storage across deployments
+Uses Pinecone Inference API for embeddings (no local model required)
 """
 
 from pinecone import Pinecone, ServerlessSpec
@@ -9,7 +10,6 @@ from config import (
     PINECONE_API_KEY,
     PINECONE_ENVIRONMENT,
     PINECONE_INDEX_NAME,
-    PINECONE_DIMENSION,
     MAX_TOKENS,
     logger
 )
@@ -22,16 +22,13 @@ class PineconeSearch:
     def __init__(self):
         """
         Initialize the Pinecone search system.
-        Uses shared embedding manager instead of loading separate model.
+        Uses Pinecone Inference API for embeddings - no local model needed.
         """
         self.pc = None
         self.index = None
         self.is_initialized = False
-    
-    @property
-    def embedding_model(self):
-        """Get shared embedding model from singleton manager"""
-        return embedding_manager.get_model()
+        # Use dimension from embedding manager (1024 for multilingual-e5-large)
+        self.dimension = embedding_manager.dimension
     
     def initialize(self, portfolio_data=None):
         """
@@ -53,10 +50,10 @@ class PineconeSearch:
             if PINECONE_INDEX_NAME not in existing_indexes:
                 logger.info(f"Creating new Pinecone index: {PINECONE_INDEX_NAME}")
                 
-                # Create serverless index with v6 API
+                # Create serverless index with correct dimension for Pinecone Inference
                 self.pc.create_index(
                     name=PINECONE_INDEX_NAME,
-                    dimension=PINECONE_DIMENSION,
+                    dimension=self.dimension,  # 1024 for multilingual-e5-large
                     metric="cosine",
                     spec=ServerlessSpec(
                         cloud="aws",
@@ -68,7 +65,7 @@ class PineconeSearch:
                 logger.info("Waiting for index to be ready...")
                 time.sleep(5)  # Give it a moment to initialize
                 
-                logger.info(f"✅ Created Pinecone index: {PINECONE_INDEX_NAME}")
+                logger.info(f"✅ Created Pinecone index: {PINECONE_INDEX_NAME} (dim={self.dimension})")
             else:
                 logger.info(f"✅ Connected to existing Pinecone index: {PINECONE_INDEX_NAME}")
             
@@ -112,22 +109,22 @@ class PineconeSearch:
             vectors = []
             batch_size = 100
             
-            for idx, item in enumerate(portfolio_data):
-                # Generate embedding
-                embedding = self.embedding_model.encode(item["text"]).tolist()
-                
+            # Get all texts for batch embedding
+            texts = [item["text"] for item in portfolio_data]
+            
+            # Generate embeddings in batch using Pinecone Inference API
+            logger.info(f"Generating embeddings for {len(texts)} documents...")
+            embeddings = embedding_manager.encode(texts, input_type="passage")
+            
+            for idx, (item, embedding) in enumerate(zip(portfolio_data, embeddings)):
                 # Prepare metadata - Pinecone only accepts simple types
-                # Convert complex objects to JSON strings
                 clean_metadata = {}
                 for key, value in item["metadata"].items():
                     if isinstance(value, (dict, list)):
-                        # Convert complex types to JSON string
                         clean_metadata[key] = json.dumps(value)
                     elif isinstance(value, (str, int, float, bool)):
-                        # Keep simple types as-is
                         clean_metadata[key] = value
                     else:
-                        # Convert other types to string
                         clean_metadata[key] = str(value)
                 
                 # Add text to metadata (truncated)
@@ -136,7 +133,7 @@ class PineconeSearch:
                 # Create vector with metadata
                 vector = {
                     "id": f"doc_{idx}",
-                    "values": embedding,
+                    "values": embedding.tolist(),
                     "metadata": clean_metadata
                 }
                 vectors.append(vector)
@@ -177,8 +174,8 @@ class PineconeSearch:
             return []
         
         try:
-            # Encode query
-            query_embedding = self.embedding_model.encode(query).tolist()
+            # Encode query using Pinecone Inference API
+            query_embedding = embedding_manager.encode(query, input_type="query")[0].tolist()
             
             # Search Pinecone index
             results = self.index.query(

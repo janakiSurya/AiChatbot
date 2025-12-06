@@ -51,8 +51,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Pinecone Configuration
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "us-east-1")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "portfolio-assistant")
-PINECONE_DIMENSION = 384  # Dimension for all-MiniLM-L6-v2 embeddings
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "portfolio-assistant-v2")
+# NOTE: Dimension is now 1024 (multilingual-e5-large via Pinecone Inference API)
+# Previously was 384 (all-MiniLM-L6-v2 local model)
 
 # Upstash Redis Configuration (for persistent cache)
 UPSTASH_REDIS_URL = os.getenv("UPSTASH_REDIS_URL")
@@ -60,7 +61,7 @@ UPSTASH_REDIS_TOKEN = os.getenv("UPSTASH_REDIS_TOKEN")
 USE_REDIS_CACHE = bool(UPSTASH_REDIS_URL and UPSTASH_REDIS_TOKEN)
 
 # Models
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+# NOTE: Embedding model is now managed by utils/embedding_manager.py (Pinecone Inference API)
 PERPLEXITY_MODEL = os.getenv("PERPLEXITY_MODEL", "sonar")
 
 # API Keys

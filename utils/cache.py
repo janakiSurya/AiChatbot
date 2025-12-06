@@ -1,6 +1,6 @@
 """
 Semantic cache for chatbot responses
-Uses sentence embeddings to detect similar queries and return cached responses
+Uses Pinecone Inference API for embeddings (no local model required)
 Includes both static pre-defined cache and dynamic LRU cache
 """
 
@@ -17,21 +17,28 @@ class SemanticCache:
     
     def __init__(self, similarity_threshold=0.85, max_dynamic_cache=50):
         """
-        Initialize semantic cache with shared embedding model.
-        Uses singleton embedding manager instead of loading separate model.
+        Initialize semantic cache.
+        Uses Pinecone Inference API for embeddings - no local model required.
         """
         self.similarity_threshold = similarity_threshold
         self.max_dynamic_cache = max_dynamic_cache
         
-        # Static cache (pre-defined common questions)
-        self.static_cache = self._initialize_static_cache()
+        # Static cache will be initialized lazily to avoid startup embedding calls
+        self._static_cache = None
         
         # Dynamic cache (learns from traffic)
         self.dynamic_cache = OrderedDict()  # {query: (embedding, response, access_count)}
         
         logger.info(f"✅ Semantic cache initialized:")
-        logger.info(f"   - Static cache: {len(self.static_cache)} categories")
+        logger.info(f"   - Static cache: lazy loading enabled")
         logger.info(f"   - Dynamic cache: max {max_dynamic_cache} entries")
+    
+    @property
+    def static_cache(self):
+        """Lazy-load static cache to avoid startup embedding API calls"""
+        if self._static_cache is None:
+            self._static_cache = self._initialize_static_cache()
+        return self._static_cache
     
     def _initialize_static_cache(self) -> Dict:
         """Initialize cache with common queries and their variations"""
@@ -103,15 +110,19 @@ class SemanticCache:
             }
         }
         
-        # Pre-compute embeddings for all cached queries using shared model
+        # Pre-compute embeddings for all cached queries using Pinecone Inference API
         cache = {}
         for category, data in cache_data.items():
-            embeddings = embedding_manager.encode(data["queries"])
-            cache[category] = {
-                "embeddings": embeddings,
-                "responses": data["responses"],
-                "last_used_index": 0  # For rotation
-            }
+            try:
+                embeddings = embedding_manager.encode(data["queries"], input_type="query")
+                cache[category] = {
+                    "embeddings": embeddings,
+                    "responses": data["responses"],
+                    "last_used_index": 0  # For rotation
+                }
+                logger.info(f"   - Loaded static cache: {category}")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to load static cache for {category}: {e}")
         
         return cache
     
@@ -126,7 +137,7 @@ class SemanticCache:
         Returns:
             Cached response if found, None otherwise
         """
-        query_embedding = embedding_manager.encode([query])[0]
+        query_embedding = embedding_manager.encode(query, input_type="query")[0]
         
         # First, check static cache (pre-defined common questions)
         for category, data in self.static_cache.items():
@@ -189,7 +200,7 @@ class SemanticCache:
             logger.info("⚠️ Not caching: response contains error/apology")
             return
         
-        query_embedding = embedding_manager.encode([query])[0]
+        query_embedding = embedding_manager.encode(query, input_type="query")[0]
         
         # Check if similar query already exists
         for cached_query, (cached_embedding, _, _) in self.dynamic_cache.items():
@@ -215,7 +226,7 @@ class SemanticCache:
         """Get cache statistics"""
         total_accesses = sum(count for _, _, count in self.dynamic_cache.values())
         return {
-            "static_categories": len(self.static_cache),
+            "static_categories": len(self._static_cache) if self._static_cache else 0,
             "dynamic_entries": len(self.dynamic_cache),
             "dynamic_total_accesses": total_accesses
         }

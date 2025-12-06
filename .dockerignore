@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+!env.example
+
+# Tests (not needed in production)
+tests/
+test_*.py
+
+# Documentation (reduces image size)
+*.md
+!README.md
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Gradio UI (not needed for API-only deployment)
+app.py
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -1,6 +1,7 @@
 """
 Redis-backed semantic cache using Upstash
 Provides persistent caching across server restarts with semantic similarity matching
+Uses Pinecone Inference API for embeddings (no local model required)
 """
 
 import json
@@ -22,7 +23,7 @@ class RedisSemanticCache:
     def __init__(self, similarity_threshold=0.85, ttl_days=30):
         """
         Initialize Redis semantic cache.
-        Uses shared embedding manager instead of loading separate model.
+        Uses Pinecone Inference API for embeddings.
         
         Args:
             similarity_threshold: Minimum similarity score for cache hit
@@ -52,8 +53,8 @@ class RedisSemanticCache:
         self.memory_cache = {}
     
     def _get_embedding(self, text: str) -> np.ndarray:
-        """Generate embedding for text using shared model"""
-        return embedding_manager.encode([text])[0]
+        """Generate embedding for text using Pinecone Inference API"""
+        return embedding_manager.encode(text)[0]
     
     def _generate_cache_key(self, query: str) -> str:
         """Generate a unique cache key for a query"""

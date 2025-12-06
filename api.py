@@ -8,8 +8,10 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from core.chat_engine import ChatEngine
+from utils.session_manager import session_manager
 from config import logger, validate_config
 import os
+from typing import Optional
 
 # Initialize Limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -44,10 +46,12 @@ chat_engine = ChatEngine()
 # Request model
 class ChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None  # Auto-generated if not provided
 
-# Response model
+# Response model  
 class ChatResponse(BaseModel):
     response: str
+    session_id: str
 
 @app.on_event("startup")
 async def startup_event():
@@ -145,19 +149,24 @@ async def get_stats():
 async def chat(request: Request, chat_request: ChatRequest):
     """
     Process a chat message and stream the response back to the client.
-    The client receives chunks as they are generated, reducing perceived latency.
+    Uses session_id for per-user conversation memory.
     """
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-
+    
+    # Get or generate session ID
+    sid = chat_request.session_id or session_manager.generate_session_id()
+    
     async def response_generator():
-        # Stream tokens directly from the chat engine
-        for chunk in chat_engine.chat_stream(chat_request.message):
+        # Stream tokens directly from the chat engine with session
+        for chunk in chat_engine.chat_stream(chat_request.message, session_id=sid):
             yield chunk
-            # Allow event loop to process other tasks
             await asyncio.sleep(0)
-
-    return StreamingResponse(response_generator(), media_type="text/plain")
+    
+    # Include session_id in response headers for client to track
+    response = StreamingResponse(response_generator(), media_type="text/plain")
+    response.headers["X-Session-ID"] = sid
+    return response
 
 
 if __name__ == "__main__":

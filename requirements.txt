@@ -2,16 +2,11 @@
 setuptools==65.5.1
 wheel==0.38.4
 
-# Core ML/AI dependencies (order matters!)
+# Core dependencies
 numpy==1.23.5
-torch==2.0.1
-torchvision==0.15.2
-sentence-transformers==2.2.2
-huggingface-hub==0.19.4
-transformers==4.35.2
 
-# Vector database
-pinecone
+# Pinecone with gRPC support (includes inference API)
+pinecone[grpc]
 
 # Web framework
 fastapi==0.104.1
@@ -31,5 +26,5 @@ upstash-redis
 # Monitoring
 psutil
 
-# UI (optional - not needed for API)
-gradio==4.44.0
+# UI (optional - not needed for API deployment)
+# gradio==4.44.0
