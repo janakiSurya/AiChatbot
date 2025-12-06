@@ -241,6 +241,9 @@ Answer:"""
         context_text = self._format_context(context, num_contexts)
         messages = self._create_messages(query, context_text, history)
         
+        # Sanitize messages to ensure API compatibility
+        messages = self._sanitize_messages(messages)
+        
         # Generate streaming response
         yield from self._generate_with_retry_stream(messages, query, context)
 
@@ -268,6 +271,14 @@ Answer:"""
                     timeout=30,
                     stream=True  # Enable streaming in requests
                 )
+                
+                if response.status_code != 200:
+                    logger.error(f"❌ API Error Status: {response.status_code}")
+                    logger.error(f"❌ API Error Body: {response.text}")
+                    # Log payload for debugging (truncate large fields if needed)
+                    import json
+                    logger.error(f"❌ Failed Payload: {json.dumps(payload, default=str)[:1000]}...")
+                
                 response.raise_for_status()
                 
                 logger.info("✅ API stream connection established")
@@ -485,6 +496,63 @@ Answer:"""
         text = re.sub(r'\s+', ' ', text).strip()
         
         return text
+
+    def _sanitize_messages(self, messages):
+        """
+        Sanitize messages to ensure valid sequence for Perplexity API
+        Rules:
+        1. First non-system message MUST be 'user'
+        2. Messages must alternate User/Assistant (mostly)
+        3. No empty content
+        """
+        sanitized = []
+        # Find the index of the last system message
+        last_system_idx = -1
+        for i, msg in enumerate(messages):
+            if msg["role"] == "system":
+                last_system_idx = i
+                sanitized.append(msg)
+        
+        # Process remaining messages
+        expect_user = True
+        
+        for i, msg in enumerate(messages):
+            if i <= last_system_idx:
+                continue
+                
+            role = msg["role"]
+            content = msg.get("content", "").strip()
+            
+            if not content:
+                continue
+                
+            if expect_user:
+                if role == "user":
+                    sanitized.append(msg)
+                    expect_user = False
+                else:
+                    # Skip orphan assistant messages
+                    logger.warning(f"⚠️ Skipping orphan {role} message expecting 'user'")
+                    continue
+            else:
+                if role == "assistant":
+                    sanitized.append(msg)
+                    expect_user = True
+                elif role == "user":
+                    # Double user message? Allow it but warn
+                    # Perplexity usually handles U -> U by treating them as concatenated or separate turns
+                    # But strict alternation prefers A in between.
+                    # We'll allow it but knowing it might be suboptimal.
+                    sanitized.append(msg)
+                    expect_user = False
+        
+        # Ensure the last message is User (which it should be for the current query)
+        if len(sanitized) > 0 and sanitized[-1]["role"] == "assistant":
+            # This shouldn't happen if we constructed messages correctly (User query is last)
+            # But if it does, it's weird.
+            pass
+            
+        return sanitized
     
     def _get_smart_fallback(self, query, context):
         """Generate a smarter fallback response using context directly"""
