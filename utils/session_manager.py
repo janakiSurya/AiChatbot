@@ -31,7 +31,7 @@ class SessionManager:
     """
     
     # Configuration
-    SESSION_TTL = 60 * 60 * 24  # 24 hours
+    SESSION_TTL = 60 * 60  # 1 hour
     MAX_MESSAGES_BEFORE_SUMMARY = 8  # Summarize after 8 messages
     MESSAGES_TO_SUMMARIZE = 4  # Summarize oldest 4, keep recent 4
     MAX_HISTORY_TOKENS = 2000  # Approx max tokens for history
